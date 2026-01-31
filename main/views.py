@@ -67,8 +67,7 @@ def statistics(request):
     """Статистика переходов между группами"""
 
     # Получаем все переходы
-    all_history = GroupHistory.objects.select_related('student', 'group').order_by('transfer_date',
-                                                                                   'student__full_name')
+    all_history = GroupHistory.objects.select_related('student', 'group').order_by('student_id', 'transfer_date')
 
     # Группируем по датам
     history_by_date = defaultdict(list)
