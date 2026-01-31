@@ -5,6 +5,142 @@
 
 {% block content %}
 
+<!-- Интерактивная визуализация потоков (первая, большая) -->
+{% if transitions %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="color: var(--color-accent-primary); margin: 0;">🌊 Визуализация потоков переходов</h2>
+
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none;">
+            <input type="checkbox" id="toggleNames" onchange="toggleStudentNames()"
+                   style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--color-accent-primary);">
+            <span style="font-size: 15px; font-weight: 500; color: var(--color-text-primary);">
+                Показать фамилии учеников
+            </span>
+        </label>
+    </div>
+
+    <div style="background: var(--color-bg-secondary); padding: 32px; border-radius: 16px; border: 1px solid var(--color-border); overflow-x: auto;">
+        <svg id="flowDiagram" width="100%" height="650" viewBox="0 0 1200 650" style="max-width: 100%;">
+            <!-- Декабрь (слева) -->
+            <text x="180" y="40" font-size="24" font-weight="700" fill="var(--color-text-primary)">16 декабря 2025</text>
+
+            <!-- Группы декабря -->
+            <rect x="80" y="80" width="200" height="70" rx="12" fill="#E3F2FD" stroke="#1976D2" stroke-width="3"/>
+            <text x="180" y="120" text-anchor="middle" font-size="20" font-weight="700" fill="#1976D2">Группа 1</text>
+            <text x="180" y="140" text-anchor="middle" font-size="14" fill="#1565C0">Ренкас И.А.</text>
+
+            <rect x="80" y="170" width="200" height="70" rx="12" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="3"/>
+            <text x="180" y="210" text-anchor="middle" font-size="20" font-weight="700" fill="#7B1FA2">Группа 2</text>
+            <text x="180" y="230" text-anchor="middle" font-size="14" fill="#6A1B9A">Крестникова Е.В.</text>
+
+            <rect x="80" y="260" width="200" height="70" rx="12" fill="#E8F5E9" stroke="#388E3C" stroke-width="3"/>
+            <text x="180" y="300" text-anchor="middle" font-size="20" font-weight="700" fill="#388E3C">Группа 2.1</text>
+            <text x="180" y="320" text-anchor="middle" font-size="14" fill="#2E7D32">Витриченко В.Э.</text>
+
+            <rect x="80" y="350" width="200" height="70" rx="12" fill="#FFF3E0" stroke="#F57C00" stroke-width="3"/>
+            <text x="180" y="390" text-anchor="middle" font-size="20" font-weight="700" fill="#F57C00">Группа 2.2</text>
+            <text x="180" y="410" text-anchor="middle" font-size="14" fill="#E65100">Шуляев М.И.</text>
+
+            <rect x="80" y="440" width="200" height="70" rx="12" fill="#FCE4EC" stroke="#C2185B" stroke-width="3"/>
+            <text x="180" y="480" text-anchor="middle" font-size="20" font-weight="700" fill="#C2185B">Группа 3</text>
+            <text x="180" y="500" text-anchor="middle" font-size="14" fill="#880E4F">Фисенко Е.М.</text>
+
+            <!-- Январь (справа) -->
+            <text x="920" y="40" font-size="24" font-weight="700" fill="var(--color-text-primary)">12 января 2026</text>
+
+            <!-- Группы января -->
+            <rect x="920" y="80" width="200" height="70" rx="12" fill="#E3F2FD" stroke="#1976D2" stroke-width="3"/>
+            <text x="1020" y="120" text-anchor="middle" font-size="20" font-weight="700" fill="#1976D2">Группа 1</text>
+            <text x="1020" y="140" text-anchor="middle" font-size="14" fill="#1565C0">Ренкас И.А.</text>
+
+            <rect x="920" y="170" width="200" height="70" rx="12" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="3"/>
+            <text x="1020" y="210" text-anchor="middle" font-size="20" font-weight="700" fill="#7B1FA2">Группа 2</text>
+            <text x="1020" y="230" text-anchor="middle" font-size="14" fill="#6A1B9A">Крестникова Е.В.</text>
+
+            <rect x="920" y="260" width="200" height="70" rx="12" fill="#E8F5E9" stroke="#388E3C" stroke-width="3"/>
+            <text x="1020" y="300" text-anchor="middle" font-size="20" font-weight="700" fill="#388E3C">Группа 2.1</text>
+            <text x="1020" y="320" text-anchor="middle" font-size="14" fill="#2E7D32">Витриченко В.Э.</text>
+
+            <rect x="920" y="350" width="200" height="70" rx="12" fill="#FFF3E0" stroke="#F57C00" stroke-width="3"/>
+            <text x="1020" y="390" text-anchor="middle" font-size="20" font-weight="700" fill="#F57C00">Группа 2.2</text>
+            <text x="1020" y="410" text-anchor="middle" font-size="14" fill="#E65100">Шуляев М.И.</text>
+
+            <rect x="920" y="440" width="200" height="70" rx="12" fill="#FCE4EC" stroke="#C2185B" stroke-width="3"/>
+            <text x="1020" y="480" text-anchor="middle" font-size="20" font-weight="700" fill="#C2185B">Группа 3</text>
+            <text x="1020" y="500" text-anchor="middle" font-size="14" fill="#880E4F">Фисенко Е.М.</text>
+
+            <!-- Стрелки с маркерами -->
+            <defs>
+                <marker id="arrow1" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                    <polygon points="0 0, 12 4, 0 8" fill="#FF6B35" />
+                </marker>
+                <marker id="arrow2" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                    <polygon points="0 0, 12 4, 0 8" fill="#4CAF50" />
+                </marker>
+                <marker id="arrow3" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                    <polygon points="0 0, 12 4, 0 8" fill="#2196F3" />
+                </marker>
+                <marker id="arrow4" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                    <polygon points="0 0, 12 4, 0 8" fill="#9C27B0" />
+                </marker>
+                <marker id="arrow5" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                    <polygon points="0 0, 12 4, 0 8" fill="#FF5722" />
+                </marker>
+                <marker id="arrow6" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                    <polygon points="0 0, 12 4, 0 8" fill="#FF9800" />
+                </marker>
+            </defs>
+
+            <!-- 2 → 1 (Король Денис) -->
+            <path d="M 280 205 Q 600 115 920 115" fill="none" stroke="#FF6B35" stroke-width="3" opacity="0.8" marker-end="url(#arrow1)"/>
+            <text x="600" y="105" text-anchor="middle" font-size="14" fill="#FF6B35" font-weight="700">1</text>
+            <text class="student-label" x="600" y="125" text-anchor="middle" font-size="13" fill="#FF6B35" font-weight="600" style="display: none;">Король Д.</text>
+
+            <!-- 2 → 2.1 (Абелюк, Рыльская) -->
+            <path d="M 280 205 Q 600 295 920 295" fill="none" stroke="#4CAF50" stroke-width="4" opacity="0.8" marker-end="url(#arrow2)"/>
+            <text x="600" y="285" text-anchor="middle" font-size="14" fill="#4CAF50" font-weight="700">2</text>
+            <text class="student-label" x="600" y="305" text-anchor="middle" font-size="13" fill="#4CAF50" font-weight="600" style="display: none;">Абелюк М., Рыльская Э.</text>
+
+            <!-- 2.1 → 2 (Лейтес, Мартиросян, Новоженов) -->
+            <path d="M 280 295 Q 600 205 920 205" fill="none" stroke="#2196F3" stroke-width="5" opacity="0.8" marker-end="url(#arrow3)"/>
+            <text x="600" y="195" text-anchor="middle" font-size="14" fill="#2196F3" font-weight="700">3</text>
+            <text class="student-label" x="600" y="215" text-anchor="middle" font-size="12" fill="#2196F3" font-weight="600" style="display: none;">Лейтес М., Мартиросян Д., Новоженов Ю.</text>
+
+            <!-- 2.1 → 2.2 (Молодцов) -->
+            <path d="M 280 295 Q 600 385 920 385" fill="none" stroke="#9C27B0" stroke-width="3" opacity="0.8" marker-end="url(#arrow4)"/>
+            <text x="600" y="375" text-anchor="middle" font-size="14" fill="#9C27B0" font-weight="700">1</text>
+            <text class="student-label" x="600" y="395" text-anchor="middle" font-size="13" fill="#9C27B0" font-weight="600" style="display: none;">Молодцов Л.</text>
+
+            <!-- 2.2 → 3 (Логунова) -->
+            <path d="M 280 385 Q 600 475 920 475" fill="none" stroke="#FF5722" stroke-width="3" opacity="0.8" marker-end="url(#arrow5)"/>
+            <text x="600" y="465" text-anchor="middle" font-size="14" fill="#FF5722" font-weight="700">1</text>
+            <text class="student-label" x="600" y="485" text-anchor="middle" font-size="13" fill="#FF5722" font-weight="600" style="display: none;">Логунова А.</text>
+
+            <!-- 3 → 2.2 (Патина) -->
+            <path d="M 280 475 Q 600 385 920 385" fill="none" stroke="#FF9800" stroke-width="3" opacity="0.8" marker-end="url(#arrow6)"/>
+            <text x="600" y="410" text-anchor="middle" font-size="14" fill="#FF9800" font-weight="700">1</text>
+            <text class="student-label" x="600" y="430" text-anchor="middle" font-size="13" fill="#FF9800" font-weight="600" style="display: none;">Патина А.</text>
+        </svg>
+
+        <div style="text-align: center; margin-top: 24px; color: var(--color-text-muted); font-size: 14px;">
+            💡 <strong>Толщина стрелки</strong> показывает количество учеников. Включите чекбокс для отображения фамилий.
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleStudentNames() {
+    const checkbox = document.getElementById('toggleNames');
+    const labels = document.querySelectorAll('.student-label');
+
+    labels.forEach(label => {
+        label.style.display = checkbox.checked ? 'block' : 'none';
+    });
+}
+</script>
+{% endif %}
+
 <!-- Общая статистика -->
 <div class="card">
     <h2 style="color: var(--color-accent-primary); margin-bottom: 24px;">📊 Общая статистика</h2>
@@ -128,112 +264,6 @@
     <p style="color: var(--color-text-muted); font-size: 14px;">
         История переходов пока не записана. Запустите скрипт <code style="background: var(--color-bg-secondary); padding: 4px 8px; border-radius: 4px;">add_december_history.py</code>
     </p>
-</div>
-{% endif %}
-
-<!-- Визуализация потоков (упрощённая диаграмма) -->
-{% if transitions %}
-<div class="card">
-    <h2 style="color: var(--color-accent-primary); margin-bottom: 20px;">🌊 Визуализация потоков переходов</h2>
-
-    <div style="background: var(--color-bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--color-border);">
-        <svg width="100%" height="450" viewBox="0 0 900 450" style="max-width: 100%;">
-            <!-- Декабрь (слева) -->
-            <text x="120" y="35" font-size="20" font-weight="700" fill="var(--color-text-primary)">16 декабря 2025</text>
-
-            <rect x="50" y="70" width="140" height="55" rx="10" fill="#E3F2FD" stroke="#1976D2" stroke-width="2"/>
-            <text x="120" y="103" text-anchor="middle" font-size="16" font-weight="600" fill="#1976D2">Группа 1</text>
-
-            <rect x="50" y="145" width="140" height="55" rx="10" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="2"/>
-            <text x="120" y="178" text-anchor="middle" font-size="16" font-weight="600" fill="#7B1FA2">Группа 2</text>
-
-            <rect x="50" y="220" width="140" height="55" rx="10" fill="#E8F5E9" stroke="#388E3C" stroke-width="2"/>
-            <text x="120" y="253" text-anchor="middle" font-size="16" font-weight="600" fill="#388E3C">Группа 2.1</text>
-
-            <rect x="50" y="295" width="140" height="55" rx="10" fill="#FFF3E0" stroke="#F57C00" stroke-width="2"/>
-            <text x="120" y="328" text-anchor="middle" font-size="16" font-weight="600" fill="#F57C00">Группа 2.2</text>
-
-            <rect x="50" y="370" width="140" height="55" rx="10" fill="#FCE4EC" stroke="#C2185B" stroke-width="2"/>
-            <text x="120" y="403" text-anchor="middle" font-size="16" font-weight="600" fill="#C2185B">Группа 3</text>
-
-            <!-- Январь (справа) -->
-            <text x="680" y="35" font-size="20" font-weight="700" fill="var(--color-text-primary)">12 января 2026</text>
-
-            <rect x="710" y="70" width="140" height="55" rx="10" fill="#E3F2FD" stroke="#1976D2" stroke-width="2"/>
-            <text x="780" y="103" text-anchor="middle" font-size="16" font-weight="600" fill="#1976D2">Группа 1</text>
-
-            <rect x="710" y="145" width="140" height="55" rx="10" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="2"/>
-            <text x="780" y="178" text-anchor="middle" font-size="16" font-weight="600" fill="#7B1FA2">Группа 2</text>
-
-            <rect x="710" y="220" width="140" height="55" rx="10" fill="#E8F5E9" stroke="#388E3C" stroke-width="2"/>
-            <text x="780" y="253" text-anchor="middle" font-size="16" font-weight="600" fill="#388E3C">Группа 2.1</text>
-
-            <rect x="710" y="295" width="140" height="55" rx="10" fill="#FFF3E0" stroke="#F57C00" stroke-width="2"/>
-            <text x="780" y="328" text-anchor="middle" font-size="16" font-weight="600" fill="#F57C00">Группа 2.2</text>
-
-            <rect x="710" y="370" width="140" height="55" rx="10" fill="#FCE4EC" stroke="#C2185B" stroke-width="2"/>
-            <text x="780" y="403" text-anchor="middle" font-size="16" font-weight="600" fill="#C2185B">Группа 3</text>
-
-            <!-- Основные стрелки переходов -->
-            <!-- 2 → 1 -->
-            <defs>
-                <marker id="arrowhead1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                    <polygon points="0 0, 10 3, 0 6" fill="#FF6B35" />
-                </marker>
-            </defs>
-            <path d="M 190 172 Q 450 97 710 97" fill="none" stroke="#FF6B35" stroke-width="2.5" opacity="0.7" marker-end="url(#arrowhead1)"/>
-            <text x="450" y="90" text-anchor="middle" font-size="12" fill="#FF6B35" font-weight="600">1 чел.</text>
-
-            <!-- 2 → 2.1 -->
-            <defs>
-                <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                    <polygon points="0 0, 10 3, 0 6" fill="#4CAF50" />
-                </marker>
-            </defs>
-            <path d="M 190 172 Q 450 247 710 247" fill="none" stroke="#4CAF50" stroke-width="3" opacity="0.7" marker-end="url(#arrowhead2)"/>
-            <text x="450" y="240" text-anchor="middle" font-size="12" fill="#4CAF50" font-weight="600">2 чел.</text>
-
-            <!-- 2.1 → 2 -->
-            <defs>
-                <marker id="arrowhead3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                    <polygon points="0 0, 10 3, 0 6" fill="#2196F3" />
-                </marker>
-            </defs>
-            <path d="M 190 247 Q 450 172 710 172" fill="none" stroke="#2196F3" stroke-width="3.5" opacity="0.7" marker-end="url(#arrowhead3)"/>
-            <text x="450" y="165" text-anchor="middle" font-size="12" fill="#2196F3" font-weight="600">3 чел.</text>
-
-            <!-- 2.1 → 2.2 -->
-            <defs>
-                <marker id="arrowhead4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                    <polygon points="0 0, 10 3, 0 6" fill="#9C27B0" />
-                </marker>
-            </defs>
-            <path d="M 190 247 Q 450 322 710 322" fill="none" stroke="#9C27B0" stroke-width="2" opacity="0.7" marker-end="url(#arrowhead4)"/>
-            <text x="450" y="315" text-anchor="middle" font-size="12" fill="#9C27B0" font-weight="600">1 чел.</text>
-
-            <!-- 2.2 → 3 -->
-            <defs>
-                <marker id="arrowhead5" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                    <polygon points="0 0, 10 3, 0 6" fill="#FF5722" />
-                </marker>
-            </defs>
-            <path d="M 190 322 Q 450 397 710 397" fill="none" stroke="#FF5722" stroke-width="2" opacity="0.7" marker-end="url(#arrowhead5)"/>
-            <text x="450" y="390" text-anchor="middle" font-size="12" fill="#FF5722" font-weight="600">1 чел.</text>
-
-            <!-- 3 → 2.2 -->
-            <defs>
-                <marker id="arrowhead6" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                    <polygon points="0 0, 10 3, 0 6" fill="#FF9800" />
-                </marker>
-            </defs>
-            <path d="M 190 397 Q 450 322 710 322" fill="none" stroke="#FF9800" stroke-width="2" opacity="0.7" marker-end="url(#arrowhead6)"/>
-            <text x="450" y="345" text-anchor="middle" font-size="12" fill="#FF9800" font-weight="600">1 чел.</text>
-        </svg>
-
-        <div style="text-align: center; margin-top: 20px; color: var(--color-text-muted); font-size: 13px;">
-            Диаграмма показывает основные направления переходов между группами (толщина стрелки = количество учеников)
-        </div>
-    </div>
 </div>
 {% endif %}
 
