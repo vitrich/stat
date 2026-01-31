@@ -149,6 +149,8 @@
             background: rgba(239, 68, 68, 0.2);
             color: var(--color-danger);
             border: 1px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .topbar__link--logout:hover {
@@ -338,7 +340,12 @@
         </nav>
         <div class="topbar__auth">
             {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="topbar__link topbar__link--logout">Выход</a>
+                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="topbar__link topbar__link--logout">
+                        Выход
+                    </button>
+                </form>
             {% else %}
                 <a href="{% url 'login' %}" class="topbar__link topbar__link--login">Вход</a>
                 <a href="{% url 'register' %}" class="topbar__link topbar__link--register">Регистрация</a>
