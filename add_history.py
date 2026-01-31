@@ -9,141 +9,110 @@ from main.models import Student, Group, GroupHistory
 from datetime import date
 
 print("=" * 80)
-print("ПРОВЕРКА РАСХОЖДЕНИЙ И ОБНОВЛЕНИЕ ИСТОРИИ")
+print("ДОБАВЛЕНИЕ ИСТОРИИ С ДАТОЙ 15.10.2025")
 print("=" * 80)
 
-# Даты
+# Все даты включая новую
 dates_map = {
     'september': date(2025, 9, 1),
-    'q2_start': date(2025, 11, 1),
+    'october_15': date(2025, 10, 15),  # НОВАЯ ДАТА!
     'december': date(2025, 12, 16),
     'january': date(2026, 1, 12)
 }
 
 # Читаем CSV файл
 file_history = {}
-with open('student_groups_history.csv', 'r', encoding='utf-8') as f:
+with open('student_groups_with_october.csv', 'r', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
         name = row['name']
         file_history[name] = {
             'class': row['class'],
             'september': float(row['september']) if row['september'] and row['september'] != '0.0' else None,
-            'q2_start': float(row['q2_start']) if row['q2_start'] and row['q2_start'] != '0.0' else None,
+            'october_15': float(row['october_15']) if row['october_15'] and row['october_15'] != '0.0' else None,
             'december': float(row['december']) if row['december'] and row['december'] != '0.0' else None,
             'january': float(row['january']) if row['january'] and row['january'] != '0.0' else None,
         }
 
 groups = {g.number: g for g in Group.objects.all()}
 
-# 1. Обновляем классы учеников
-print("\n📚 Обновление классов учеников:")
-for name, data in file_history.items():
-    class_name = data['class']
+# Показываем что будем добавлять
+print("\n📊 Данные для добавления:")
+print(f"Всего учеников: {len(file_history)}")
+print(f"Даты: {list(dates_map.keys())}")
 
-    try:
-        student = Student.objects.get(full_name=name)
-        if student.class_name != class_name:
-            old_class = student.class_name or 'не указан'
-            student.class_name = class_name
-            student.save()
-            print(f"  ✓ {name}: класс обновлен ({old_class} → {class_name})")
-    except Student.DoesNotExist:
-        print(f"  ⚠️ Ученик не найден: {name}")
-    except Student.MultipleObjectsReturned:
-        print(f"  ⚠️ Несколько учеников с именем: {name}")
-
-# 2. Получаем текущую историю из БД
-print("\n📊 Сравнение с историей в БД:")
-db_history = {}
-for entry in GroupHistory.objects.all().select_related('student', 'group').order_by('student_id', 'transfer_date'):
-    student_name = entry.student.full_name
-    if student_name not in db_history:
-        db_history[student_name] = {}
-
-    # Определяем к какой дате относится
-    if entry.transfer_date == date(2025, 9, 1):
-        db_history[student_name]['september'] = entry.group.number
-    elif entry.transfer_date == date(2025, 11, 1):
-        db_history[student_name]['q2_start'] = entry.group.number
-    elif entry.transfer_date == date(2025, 12, 16):
-        db_history[student_name]['december'] = entry.group.number
-    elif entry.transfer_date == date(2026, 1, 12):
-        db_history[student_name]['january'] = entry.group.number
-
-# 3. Находим расхождения
-discrepancies = []
+# Подсчитываем сколько записей будет добавлено
+total_records = 0
 for name, file_data in file_history.items():
-    db_data = db_history.get(name, {})
+    for period in ['september', 'october_15', 'december', 'january']:
+        if file_data.get(period) is not None:
+            total_records += 1
 
-    for period in ['september', 'q2_start', 'december', 'january']:
-        file_group = file_data.get(period)
-        db_group = db_data.get(period)
+print(f"Всего записей для добавления: {total_records}")
 
-        if file_group is None:
-            continue
+# Спрашиваем подтверждение
+response = input("\n❓ Очистить текущую историю и добавить новую? (yes/no): ")
 
-        if file_group != db_group:
-            discrepancies.append({
-                'name': name,
-                'period': period,
-                'file_group': file_group,
-                'db_group': db_group
-            })
-            print(f"  🔍 {name} ({period}): файл={file_group}, БД={db_group if db_group else 'отсутствует'}")
+if response.lower() == 'yes':
+    print("\n🔄 Обновление истории...")
 
-print(f"\n{'=' * 80}")
-print(f"Найдено расхождений: {len(discrepancies)}")
-print(f"{'=' * 80}")
+    # Очищаем историю
+    deleted = GroupHistory.objects.all().delete()
+    print(f"  ✓ Удалено старых записей: {deleted[0]}")
 
-# 4. Предлагаем обновить
-if discrepancies:
-    response = input("\n❓ Обновить историю на основе файла? (yes/no): ")
-    if response.lower() == 'yes':
-        print("\n🔄 Обновление истории...")
+    # Добавляем новую историю из файла
+    added_count = 0
+    errors = []
 
-        # Очищаем историю
-        GroupHistory.objects.all().delete()
-        print("  ✓ История очищена")
+    for name, file_data in file_history.items():
+        try:
+            student = Student.objects.get(full_name=name)
 
-        # Добавляем новую историю из файла
-        added_count = 0
-        for name, file_data in file_history.items():
-            try:
-                student = Student.objects.get(full_name=name)
+            # Обновляем класс
+            if file_data['class'] and student.class_name != file_data['class']:
+                student.class_name = file_data['class']
+                student.save()
 
-                # Добавляем записи для каждой даты
-                for period, date_val in dates_map.items():
-                    group_num = file_data.get(period)
+            # Добавляем записи для каждой даты
+            for period, date_val in dates_map.items():
+                group_num = file_data.get(period)
 
-                    if group_num is None:
-                        continue
+                if group_num is None:
+                    continue
 
-                    if group_num in groups:
-                        group = groups[group_num]
+                if group_num in groups:
+                    group = groups[group_num]
 
-                        GroupHistory.objects.create(
-                            student=student,
-                            group=group,
-                            transfer_date=date_val,
-                            reason=f'Данные из файла ({period})'
-                        )
-                        added_count += 1
+                    GroupHistory.objects.create(
+                        student=student,
+                        group=group,
+                        transfer_date=date_val,
+                        reason=f'Данные из файла ({period})'
+                    )
+                    added_count += 1
+                else:
+                    errors.append(f"Группа {group_num} не найдена для {name}")
 
-                # Обновляем текущую группу
-                jan_group = file_data.get('january')
-                if jan_group and jan_group in groups:
-                    student.current_group = groups[jan_group]
-                    student.save()
+            # Обновляем текущую группу
+            jan_group = file_data.get('january')
+            if jan_group and jan_group in groups:
+                student.current_group = groups[jan_group]
+                student.save()
 
-            except Student.DoesNotExist:
-                print(f"  ⚠️ Ученик не найден: {name}")
-            except Student.MultipleObjectsReturned:
-                print(f"  ⚠️ Несколько учеников с именем: {name}")
+        except Student.DoesNotExist:
+            errors.append(f"Ученик не найден: {name}")
+        except Student.MultipleObjectsReturned:
+            errors.append(f"Несколько учеников с именем: {name}")
 
-        print(f"  ✓ Добавлено записей: {added_count}")
-        print("\n✅ История успешно обновлена!")
-    else:
-        print("\n❌ Обновление отменено")
+    print(f"  ✓ Добавлено записей: {added_count}")
+
+    if errors:
+        print(f"\n⚠️ Ошибки ({len(errors)}):")
+        for error in errors[:10]:  # Показываем первые 10
+            print(f"  - {error}")
+        if len(errors) > 10:
+            print(f"  ... и ещё {len(errors) - 10}")
+
+    print("\n✅ История успешно обновлена с датой 15.10.2025!")
 else:
-    print("\n✅ Расхождений не найдено!")
+    print("\n❌ Обновление отменено")
