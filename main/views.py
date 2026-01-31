@@ -68,12 +68,22 @@ def students_progress(request):
 def statistics(request):
     """Статистика переходов между группами - интерактивный график"""
 
-    # Все ключевые даты
-    key_dates = [
-        date(2025, 9, 1),
-        date(2025, 12, 16),
-        date(2026, 1, 12)
-    ]
+    # АВТОМАТИЧЕСКИ ОПРЕДЕЛЯЕМ ВСЕ УНИКАЛЬНЫЕ ДАТЫ ИЗ БД
+    key_dates = list(
+        GroupHistory.objects
+        .values_list('transfer_date', flat=True)
+        .distinct()
+        .order_by('transfer_date')
+    )
+
+    if not key_dates:
+        # Если истории нет, используем дефолтные даты
+        key_dates = [
+            date(2025, 9, 1),
+            date(2025, 10, 15),
+            date(2025, 12, 16),
+            date(2026, 1, 12)
+        ]
 
     # Получаем всю историю
     all_history = GroupHistory.objects.select_related('student', 'group').order_by('student_id', 'transfer_date')
@@ -108,10 +118,6 @@ def statistics(request):
         first_date = history_sorted[0]['date']
         first_group = history_sorted[0]['group']
 
-        # Последняя дата - когда ученик последний раз был в системе
-        last_date = history_sorted[-1]['date']
-        last_group = history_sorted[-1]['group']
-
         # Индекс текущей записи в истории
         history_index = 0
         current_group = first_group
@@ -122,17 +128,11 @@ def statistics(request):
             if key_date < first_date:
                 continue
 
-            # Пропускаем даты после ухода ученика (если он ушел)
-            # (предполагаем, что если последняя запись не на последнюю дату, то ученик ушел)
-            # Но по условию задачи ученики не уходят, так что показываем до конца
-
             # Проверяем, есть ли изменение группы на эту дату
-            changed = False
             for i in range(history_index, len(history_sorted)):
                 if history_sorted[i]['date'] == key_date:
                     current_group = history_sorted[i]['group']
                     history_index = i + 1
-                    changed = True
                     break
                 elif history_sorted[i]['date'] > key_date:
                     break
@@ -145,7 +145,7 @@ def statistics(request):
 
         students_full_history[student_id] = full_history
 
-    # Собираем список учеников с историей (у кого есть хоть одна запись)
+    # Собираем список учеников с историей
     students_with_transitions = []
     for student_id, history in students_full_history.items():
         if len(history) > 0:
@@ -169,6 +169,9 @@ def statistics(request):
             'teacher': group.teacher.full_name if group.teacher else 'Не назначен'
         })
 
+    # Форматируем даты для отображения
+    dates_formatted = [d.strftime('%d.%m.%Y') for d in key_dates]
+
     context = {
         'students_with_transitions': students_with_transitions,
         'students_json': json.dumps({
@@ -178,6 +181,8 @@ def statistics(request):
             } for s in students_with_transitions
         }),
         'group_stats': group_stats,
+        'key_dates': dates_formatted,  # Передаем даты в шаблон
+        'dates_count': len(key_dates),  # Количество дат
     }
 
     return render(request, 'statistics.html', context)
