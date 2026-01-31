@@ -4,22 +4,22 @@
 {% block page_description %}Войдите в систему{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 500px; margin: 0 auto;">
-    <h2 style="color: var(--color-accent-light); margin-bottom: 24px;">Вход в систему</h2>
+<div class="card" style="max-width: 500px; margin: 60px auto;">
+    <h2 style="color: var(--color-accent-primary); margin-bottom: 24px;">🔐 Вход в систему</h2>
 
     <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
         {% csrf_token %}
 
         {% if form.errors %}
         <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 12px; border-radius: 8px; color: var(--color-danger);">
-            Неверное имя пользователя или пароль
+            ❌ Неверное имя пользователя или пароль
         </div>
         {% endif %}
 
         <!-- Имя пользователя -->
         <div>
             <label for="id_username" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                Имя пользователя
+                👤 Имя пользователя
             </label>
             <input
                 type="text"
@@ -27,6 +27,7 @@
                 id="id_username"
                 autofocus
                 required
+                placeholder="Введите логин"
                 style="width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;"
             >
         </div>
@@ -34,31 +35,32 @@
         <!-- Пароль -->
         <div>
             <label for="id_password" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                Пароль
+                🔑 Пароль
             </label>
             <input
                 type="password"
                 name="password"
                 id="id_password"
                 required
+                placeholder="Введите пароль"
                 style="width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;"
             >
         </div>
 
+        <!-- Кнопка входа (ИСПРАВЛЕНА!) -->
         <button
             type="submit"
-            style="background: linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-burgundy) 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(189, 46, 141, 0.3);"
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(189, 46, 141, 0.5)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(189, 46, 141, 0.3)'"
+            class="login-btn"
+            style="background: var(--color-accent-primary); color: white; padding: 14px 24px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);"
         >
-            Войти
+            Войти →
         </button>
     </form>
 
     <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border); text-align: center;">
         <p style="color: var(--color-text-secondary); margin: 0;">
             Нет аккаунта?
-            <a href="{% url 'register' %}" style="color: var(--color-accent-light); text-decoration: none; font-weight: 500; transition: color 0.3s ease;">
+            <a href="{% url 'register' %}" style="color: var(--color-orange); text-decoration: none; font-weight: 500; transition: color 0.3s ease;">
                 Зарегистрируйтесь
             </a>
         </p>
@@ -69,7 +71,17 @@
     input:focus {
         outline: none;
         border-color: var(--color-accent-primary) !important;
-        box-shadow: 0 0 0 3px rgba(189, 46, 141, 0.2);
+        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+    }
+
+    .login-btn:hover {
+        background: var(--color-accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(25, 118, 210, 0.5);
+    }
+
+    .login-btn:active {
+        transform: translateY(0);
     }
 </style>
 {% endblock %}
