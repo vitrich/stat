@@ -5,6 +5,7 @@ from .forms import StudentRegistrationForm
 from .models import GroupHistory, Student, Group
 from collections import defaultdict
 import json
+from datetime import date
 
 
 def home(request):
@@ -67,19 +68,25 @@ def students_progress(request):
 def statistics(request):
     """Статистика переходов между группами - интерактивный график"""
 
+    # Все ключевые даты
+    key_dates = [
+        date(2025, 9, 1),
+        date(2025, 12, 16),
+        date(2026, 1, 12)
+    ]
+
     # Получаем всю историю
     all_history = GroupHistory.objects.select_related('student', 'group').order_by('student_id', 'transfer_date')
 
-    # Собираем полную историю для каждого ученика
-    students_full_history = defaultdict(list)
+    # Собираем историю для каждого ученика
+    students_history_raw = defaultdict(list)
     students_info = {}
 
     for entry in all_history:
         student_id = entry.student.id
-        students_full_history[student_id].append({
-            'date': entry.transfer_date.strftime('%Y-%m-%d'),
-            'group': float(entry.group.number),
-            'reason': entry.reason
+        students_history_raw[student_id].append({
+            'date': entry.transfer_date,
+            'group': float(entry.group.number)
         })
         if student_id not in students_info:
             students_info[student_id] = {
@@ -87,79 +94,32 @@ def statistics(request):
                 'name': entry.student.full_name
             }
 
-    # Группируем по датам
-    history_by_date = defaultdict(list)
-    for entry in all_history:
-        history_by_date[entry.transfer_date].append(entry)
+    # Дополняем историю промежуточными точками
+    students_full_history = {}
 
-    # Находим переходы (ученики с более чем 1 записью)
-    students_with_changes = defaultdict(list)
-    for entry in all_history:
-        students_with_changes[entry.student.id].append(entry)
+    for student_id, history in students_history_raw.items():
+        # Сортируем по дате
+        history_sorted = sorted(history, key=lambda x: x['date'])
 
-    # Собираем список учеников с переходами
-    students_with_transitions = []
-    for student_id, entries in students_with_changes.items():
-        if len(entries) > 1:
-            students_with_transitions.append({
-                'id': student_id,
-                'name': entries[0].student.full_name,
-                'history': students_full_history[student_id]
-            })
+        # Собираем полную историю с промежуточными точками
+        full_history = []
 
-    # Сортируем по имени
-    students_with_transitions.sort(key=lambda x: x['name'])
+        # Первая дата - когда ученик появился
+        first_date = history_sorted[0]['date']
+        first_group = history_sorted[0]['group']
 
-    # Статистика по группам
-    groups = Group.objects.all().order_by('number')
-    group_stats = []
-    for group in groups:
-        current_count = Student.objects.filter(current_group=group).count()
-        group_stats.append({
-            'group': group,
-            'current_count': current_count,
-            'teacher': group.teacher.full_name if group.teacher else 'Не назначен'
-        })
+        # Последняя дата - когда ученик последний раз был в системе
+        last_date = history_sorted[-1]['date']
+        last_group = history_sorted[-1]['group']
 
-    context = {
-        'students_with_transitions': students_with_transitions,
-        'students_json': json.dumps({
-            s['id']: {
-                'name': s['name'],
-                'history': s['history']
-            } for s in students_with_transitions
-        }),
-        'group_stats': group_stats,
-    }
+        # Индекс текущей записи в истории
+        history_index = 0
+        current_group = first_group
 
-    return render(request, 'statistics.html', context)
+        # Проходим по всем ключевым датам
+        for key_date in key_dates:
+            # Пропускаем даты до появления ученика
+            if key_date < first_date:
+                continue
 
-
-@login_required
-def stats_overview(request):
-    return render(request, 'statistics.html', {'view': 'overview'})
-
-
-@login_required
-def stats_reports(request):
-    return render(request, 'statistics.html', {'view': 'reports'})
-
-
-@login_required
-def stats_analytics(request):
-    return render(request, 'statistics.html', {'view': 'analytics'})
-
-
-# Регистрация
-def register(request):
-    if request.method == 'POST':
-        form = StudentRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            student = form.cleaned_data['student']
-            messages.success(request, f'Регистрация успешна! Добро пожаловать, {student.full_name}!')
-            return redirect('login')
-    else:
-        form = StudentRegistrationForm()
-
-    return render(request, 'register.html', {'form': form})
+            # Пропускаем даты п
