@@ -6,19 +6,36 @@
     <title>{% block title %}Образовательная платформа{% endblock %}</title>
     <style>
         :root {
-            --color-bg-primary: #1a0a2e;
-            --color-bg-secondary: #240e42;
-            --color-bg-tertiary: #2d1454;
-            --color-accent-primary: #7c3aed;
-            --color-accent-hover: #9333ea;
-            --color-accent-light: #a78bfa;
-            --color-text-primary: #f3f4f6;
-            --color-text-secondary: #d1d5db;
-            --color-text-muted: #9ca3af;
-            --color-border: #3b2563;
+            /* Основные фоны - палитра "Бордовый закат" */
+            --color-bg-primary: #1a0916;
+            --color-bg-secondary: #2d0a1f;
+            --color-bg-tertiary: #3d1228;
+
+            /* Акцентные цвета */
+            --color-accent-primary: #bd2e8d;
+            --color-accent-hover: #aa1f7b;
+            --color-accent-light: #da70d6;
+
+            /* Бордовые акценты */
+            --color-burgundy: #630922;
+            --color-burgundy-hover: #800021;
+            --color-maroon: #550000;
+
+            /* Текст */
+            --color-text-primary: #fff5f7;
+            --color-text-secondary: #ffd6d1;
+            --color-text-muted: #d1a5a0;
+
+            /* Золотые акценты */
+            --color-gold: #d4af37;
+
+            /* Рамки и UI */
+            --color-border: #561b55;
             --color-success: #10b981;
             --color-warning: #f59e0b;
             --color-danger: #ef4444;
+
+            /* Размеры */
             --sidebar-width: 240px;
             --topbar-height: 64px;
         }
@@ -31,7 +48,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: var(--color-bg-primary);
+            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
             color: var(--color-text-primary);
             line-height: 1.6;
         }
@@ -49,18 +66,19 @@
             align-items: center;
             padding: 0 24px;
             z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(189, 46, 141, 0.3);
         }
 
         .topbar__logo {
             font-size: 24px;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent-primary) 100%);
+            background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-gold) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-right: 48px;
             white-space: nowrap;
+            text-shadow: 0 0 30px rgba(218, 112, 214, 0.5);
         }
 
         .topbar__nav {
@@ -82,13 +100,15 @@
         }
 
         .topbar__link:hover {
-            background: rgba(124, 58, 237, 0.15);
+            background: rgba(189, 46, 141, 0.2);
             color: var(--color-accent-light);
+            box-shadow: 0 0 15px rgba(189, 46, 141, 0.3);
         }
 
         .topbar__link.active {
-            background: var(--color-accent-primary);
+            background: linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-accent-hover) 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(189, 46, 141, 0.4);
         }
 
         .topbar__link.active::after {
@@ -98,7 +118,8 @@
             left: 18px;
             right: 18px;
             height: 2px;
-            background: var(--color-accent-light);
+            background: var(--color-gold);
+            box-shadow: 0 0 10px var(--color-gold);
         }
 
         .topbar__auth {
@@ -109,25 +130,29 @@
 
         .topbar__link--login {
             border: 1px solid var(--color-border);
+            background: rgba(99, 9, 34, 0.3);
         }
 
         .topbar__link--register {
-            background: var(--color-accent-primary);
+            background: linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-burgundy) 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(189, 46, 141, 0.3);
         }
 
         .topbar__link--register:hover {
-            background: var(--color-accent-hover);
+            background: linear-gradient(135deg, var(--color-accent-hover) 0%, var(--color-burgundy-hover) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(189, 46, 141, 0.5);
         }
 
         .topbar__link--logout {
-            background: rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, 0.2);
             color: var(--color-danger);
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .topbar__link--logout:hover {
-            background: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.3);
         }
 
         /* Левое боковое меню */
@@ -137,11 +162,12 @@
             left: 0;
             width: var(--sidebar-width);
             height: calc(100vh - var(--topbar-height));
-            background: var(--color-bg-secondary);
+            background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-maroon) 100%);
             border-right: 2px solid var(--color-border);
             padding: 24px 0;
             overflow-y: auto;
             z-index: 100;
+            box-shadow: 4px 0 20px rgba(99, 9, 34, 0.5);
         }
 
         .sidebar__section {
@@ -153,8 +179,9 @@
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1.2px;
-            color: var(--color-text-muted);
+            color: var(--color-gold);
             font-weight: 600;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
 
         .sidebar__menu {
@@ -172,21 +199,25 @@
             color: var(--color-text-secondary);
             text-decoration: none;
             border-radius: 8px;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             font-size: 14px;
             font-weight: 500;
+            border-left: 3px solid transparent;
         }
 
         .sidebar__link:hover {
-            background: rgba(124, 58, 237, 0.12);
+            background: rgba(189, 46, 141, 0.15);
             color: var(--color-accent-light);
             transform: translateX(4px);
+            border-left-color: var(--color-accent-light);
+            box-shadow: 0 0 15px rgba(189, 46, 141, 0.3);
         }
 
         .sidebar__link.active {
-            background: rgba(124, 58, 237, 0.2);
+            background: linear-gradient(90deg, rgba(189, 46, 141, 0.3) 0%, rgba(99, 9, 34, 0.2) 100%);
             color: var(--color-accent-light);
-            border-left: 3px solid var(--color-accent-primary);
+            border-left-color: var(--color-gold);
+            box-shadow: 0 0 20px rgba(189, 46, 141, 0.4);
         }
 
         .sidebar__icon {
@@ -206,6 +237,10 @@
 
         .content-header {
             margin-bottom: 32px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(189, 46, 141, 0.1) 0%, rgba(99, 9, 34, 0.1) 100%);
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
         }
 
         .content-header h1 {
@@ -213,6 +248,10 @@
             font-weight: 700;
             color: var(--color-text-primary);
             margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-gold) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .content-header p {
@@ -222,18 +261,25 @@
 
         /* Карточки для контента */
         .card {
-            background: var(--color-bg-secondary);
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
             border: 1px solid var(--color-border);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px rgba(99, 9, 34, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 32px rgba(189, 46, 141, 0.5);
+            transform: translateY(-2px);
         }
 
         .card h2 {
             color: var(--color-accent-light);
             margin-bottom: 16px;
             font-size: 20px;
+            text-shadow: 0 0 20px rgba(218, 112, 214, 0.3);
         }
 
         /* Адаптивность */
@@ -271,19 +317,19 @@
         }
 
         .sidebar::-webkit-scrollbar-thumb {
-            background: var(--color-border);
+            background: linear-gradient(180deg, var(--color-accent-primary) 0%, var(--color-burgundy) 100%);
             border-radius: 3px;
         }
 
         .sidebar::-webkit-scrollbar-thumb:hover {
-            background: var(--color-accent-primary);
+            background: var(--color-accent-hover);
         }
     </style>
 </head>
 <body>
     <!-- Верхняя панель навигации -->
     <header class="topbar">
-        <div class="topbar__logo">📚 Stat Platform</div>
+        <div class="topbar__logo">🌹 Stat Platform</div>
         <nav class="topbar__nav">
             <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">Новости</a>
             <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">Задачи</a>
@@ -403,7 +449,7 @@
         {% block content %}
         <div class="card">
             <h2>Добро пожаловать!</h2>
-            <p>Это базовый шаблон Django с красивым дизайном в темно-фиолетовых тонах.</p>
+            <p>Это базовый шаблон Django с красивым дизайном в бордово-фиолетовых тонах.</p>
         </div>
         {% endblock %}
     </main>
