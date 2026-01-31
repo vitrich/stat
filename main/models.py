@@ -43,21 +43,19 @@ class Group(models.Model):
 
 
 class Student(models.Model):
-    """Ученик"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='student_profile')
-    full_name = models.CharField(max_length=200, verbose_name='ФИО', unique=True)
-    current_group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, related_name='students',
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=200, verbose_name='ФИО')
+    class_name = models.CharField(max_length=50, blank=True, null=True, verbose_name='Класс')  # НОВОЕ ПОЛЕ
+    current_group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True,
                                       verbose_name='Текущая группа')
-    is_registered = models.BooleanField(default=False, verbose_name='Зарегистрирован')
-    parent_contact = models.CharField(max_length=200, blank=True, verbose_name='Контакт родителя')
+
+    def __str__(self):
+        return self.full_name
 
     class Meta:
         verbose_name = 'Ученик'
         verbose_name_plural = 'Ученики'
         ordering = ['full_name']
-
-    def __str__(self):
-        return self.full_name
 
 
 class GroupHistory(models.Model):
