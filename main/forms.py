@@ -4,50 +4,19 @@ from .models import Student
 
 
 class StudentRegistrationForm(forms.Form):
-    """Форма регистрации ученика с выбором из базы"""
     student = forms.ModelChoiceField(
-        queryset=Student.objects.filter(is_registered=False).order_by('full_name'),
-        label='Выберите себя из списка',
-        empty_label='-- Выберите своё имя --',
-        widget=forms.Select(attrs={
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;'
-        })
+        queryset=Student.objects.filter(user__isnull=True).order_by('full_name'),
+        label='Выберите ученика',
+        empty_label='--- Выберите ---'
     )
-
-    username = forms.CharField(
-        label='Имя пользователя',
-        max_length=150,
-        help_text='Придумайте логин для входа',
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Например: ivan_ivanov',
-            'style': 'width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;'
-        })
-    )
-
-    password1 = forms.CharField(
-        label='Пароль',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Придумайте пароль',
-            'style': 'width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;'
-        })
-    )
-
-    password2 = forms.CharField(
-        label='Подтверждение пароля',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Повторите пароль',
-            'style': 'width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;'
-        })
-    )
+    username = forms.CharField(max_length=150, label='Имя пользователя')
+    password1 = forms.CharField(widget=forms.PasswordInput, label='Пароль')
+    password2 = forms.CharField(widget=forms.PasswordInput, label='Подтвердите пароль')
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError('Это имя пользователя уже занято')
+            raise forms.ValidationError('Пользователь с таким именем уже существует')
         return username
 
     def clean(self):
@@ -61,7 +30,6 @@ class StudentRegistrationForm(forms.Form):
         return cleaned_data
 
     def save(self):
-        """Создаём пользователя и связываем с учеником"""
         student = self.cleaned_data['student']
         username = self.cleaned_data['username']
         password = self.cleaned_data['password1']
@@ -70,12 +38,12 @@ class StudentRegistrationForm(forms.Form):
         user = User.objects.create_user(
             username=username,
             password=password,
-            first_name=student.full_name.split()[0] if ' ' in student.full_name else student.full_name
+            first_name=student.full_name.split()[1] if len(student.full_name.split()) > 1 else '',
+            last_name=student.full_name.split()[0] if len(student.full_name.split()) > 0 else ''
         )
 
         # Связываем с учеником
         student.user = user
-        student.is_registered = True
         student.save()
 
         return user
