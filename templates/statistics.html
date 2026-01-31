@@ -165,9 +165,33 @@ function updateChart() {
     const chartWidth = canvas.width - padding * 2;
     const chartHeight = canvas.height - padding * 2;
 
-    // Даты (ось X)
-    const dates = ['2025-09-01', '2025-12-16', '2026-01-12'];
-    const dateLabels = ['1 сентября', '16 декабря', '12 января'];
+    // АВТОМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ ДАТ ИЗ ДАННЫХ
+    const dates = [];
+    const dateLabels = [];
+
+    // Собираем все уникальные даты из истории учеников
+    const allDates = new Set();
+    Object.values(studentsData).forEach(student => {
+        student.history.forEach(point => {
+            allDates.add(point.date);
+        });
+    });
+
+    // Сортируем даты
+    const sortedDates = Array.from(allDates).sort();
+
+    // Форматируем даты для отображения
+    sortedDates.forEach(dateStr => {
+        dates.push(dateStr);
+
+        // Форматируем дату
+        const date = new Date(dateStr);
+        const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+                       'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        dateLabels.push(`${day} ${month}`);
+    });
 
     // Группы (ось Y)
     const groups = [1, 2, 2.1, 2.2, 3];
