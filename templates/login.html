@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Вход{% endblock %}
+{% block page_description %}Войдите в систему{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 0 auto;">
+    <h2>Вход в систему</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--color-text-secondary);">Имя пользователя:</label>
+            {{ form.username }}
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--color-text-secondary);">Пароль:</label>
+            {{ form.password }}
+        </div>
+        {% if form.errors %}
+        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 16px; color: var(--color-danger);">
+            Неверное имя пользователя или пароль
+        </div>
+        {% endif %}
+        <button type="submit" style="background: var(--color-accent-primary); color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500;">Войти</button>
+    </form>
+    <p style="margin-top: 16px; text-align: center; color: var(--color-text-secondary);">
+        Нет аккаунта? <a href="{% url 'register' %}" style="color: var(--color-accent-light); text-decoration: none;">Зарегистрируйтесь</a>
+    </p>
+</div>
+{% endblock %}

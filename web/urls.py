@@ -16,7 +16,39 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth import views as auth_views
+from main import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Главная
+    path('', views.home, name='home'),
+
+    # Новости
+    path('news/', views.news, name='news'),
+    path('news/archive/', views.news_archive, name='news_archive'),
+
+    # Задачи
+    path('tasks/', views.tasks, name='tasks'),
+    path('tasks/active/', views.tasks_active, name='tasks_active'),
+    path('tasks/completed/', views.tasks_completed, name='tasks_completed'),
+    path('tasks/create/', views.tasks_create, name='tasks_create'),
+
+    # Ученики
+    path('students/', views.students, name='students'),
+    path('students/list/', views.students_list, name='students_list'),
+    path('students/groups/', views.students_groups, name='students_groups'),
+    path('students/progress/', views.students_progress, name='students_progress'),
+
+    # Статистика
+    path('statistics/', views.statistics, name='statistics'),
+    path('statistics/overview/', views.stats_overview, name='stats_overview'),
+    path('statistics/reports/', views.stats_reports, name='stats_reports'),
+    path('statistics/analytics/', views.stats_analytics, name='stats_analytics'),
+
+    # Аутентификация
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('register/', views.register, name='register'),
 ]

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Образовательная платформа{% endblock %}</title>
+    <style>
+        :root {
+            --color-bg-primary: #1a0a2e;
+            --color-bg-secondary: #240e42;
+            --color-bg-tertiary: #2d1454;
+            --color-accent-primary: #7c3aed;
+            --color-accent-hover: #9333ea;
+            --color-accent-light: #a78bfa;
+            --color-text-primary: #f3f4f6;
+            --color-text-secondary: #d1d5db;
+            --color-text-muted: #9ca3af;
+            --color-border: #3b2563;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --sidebar-width: 240px;
+            --topbar-height: 64px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        /* Верхнее меню */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+            border-bottom: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .topbar__logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent-primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 48px;
+            white-space: nowrap;
+        }
+
+        .topbar__nav {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            align-items: center;
+        }
+
+        .topbar__link {
+            padding: 10px 18px;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 15px;
+            position: relative;
+        }
+
+        .topbar__link:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--color-accent-light);
+        }
+
+        .topbar__link.active {
+            background: var(--color-accent-primary);
+            color: white;
+        }
+
+        .topbar__link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 18px;
+            right: 18px;
+            height: 2px;
+            background: var(--color-accent-light);
+        }
+
+        .topbar__auth {
+            display: flex;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .topbar__link--login {
+            border: 1px solid var(--color-border);
+        }
+
+        .topbar__link--register {
+            background: var(--color-accent-primary);
+            color: white;
+        }
+
+        .topbar__link--register:hover {
+            background: var(--color-accent-hover);
+        }
+
+        .topbar__link--logout {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--color-danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .topbar__link--logout:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* Левое боковое меню */
+        .sidebar {
+            position: fixed;
+            top: var(--topbar-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--topbar-height));
+            background: var(--color-bg-secondary);
+            border-right: 2px solid var(--color-border);
+            padding: 24px 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar__section {
+            margin-bottom: 32px;
+        }
+
+        .sidebar__title {
+            padding: 0 20px 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--color-text-muted);
+            font-weight: 600;
+        }
+
+        .sidebar__menu {
+            list-style: none;
+        }
+
+        .sidebar__item {
+            margin: 4px 12px;
+        }
+
+        .sidebar__link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar__link:hover {
+            background: rgba(124, 58, 237, 0.12);
+            color: var(--color-accent-light);
+            transform: translateX(4px);
+        }
+
+        .sidebar__link.active {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--color-accent-light);
+            border-left: 3px solid var(--color-accent-primary);
+        }
+
+        .sidebar__icon {
+            margin-right: 12px;
+            font-size: 18px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Основной контент */
+        .main-content {
+            margin-top: var(--topbar-height);
+            margin-left: var(--sidebar-width);
+            padding: 32px;
+            min-height: calc(100vh - var(--topbar-height));
+        }
+
+        .content-header {
+            margin-bottom: 32px;
+        }
+
+        .content-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 8px;
+        }
+
+        .content-header p {
+            color: var(--color-text-muted);
+            font-size: 16px;
+        }
+
+        /* Карточки для контента */
+        .card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: var(--color-accent-light);
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .topbar__logo {
+                font-size: 18px;
+                margin-right: 16px;
+            }
+
+            .topbar__nav {
+                display: none;
+            }
+        }
+
+        /* Скроллбар */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--color-bg-primary);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--color-accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя панель навигации -->
+    <header class="topbar">
+        <div class="topbar__logo">📚 Stat Platform</div>
+        <nav class="topbar__nav">
+            <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">Новости</a>
+            <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">Задачи</a>
+            <a href="{% url 'students' %}" class="topbar__link {% if request.path == '/students/' %}active{% endif %}">Ученики</a>
+            <a href="{% url 'statistics' %}" class="topbar__link {% if request.path == '/statistics/' %}active{% endif %}">Статистика</a>
+        </nav>
+        <div class="topbar__auth">
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="topbar__link topbar__link--logout">Выход</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="topbar__link topbar__link--login">Вход</a>
+                <a href="{% url 'register' %}" class="topbar__link topbar__link--register">Регистрация</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Левая боковая панель -->
+    <aside class="sidebar">
+        <div class="sidebar__section">
+            <div class="sidebar__title">Навигация</div>
+            <ul class="sidebar__menu">
+                <li class="sidebar__item">
+                    <a href="{% url 'news' %}" class="sidebar__link {% if request.path == '/news/' %}active{% endif %}">
+                        <span class="sidebar__icon">📰</span>
+                        Все новости
+                    </a>
+                </li>
+                <li class="sidebar__item">
+                    <a href="{% url 'news_archive' %}" class="sidebar__link">
+                        <span class="sidebar__icon">📦</span>
+                        Архив новостей
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar__section">
+            <div class="sidebar__title">Задачи</div>
+            <ul class="sidebar__menu">
+                <li class="sidebar__item">
+                    <a href="{% url 'tasks_active' %}" class="sidebar__link">
+                        <span class="sidebar__icon">✓</span>
+                        Активные задачи
+                    </a>
+                </li>
+                <li class="sidebar__item">
+                    <a href="{% url 'tasks_completed' %}" class="sidebar__link">
+                        <span class="sidebar__icon">✔</span>
+                        Выполненные
+                    </a>
+                </li>
+                <li class="sidebar__item">
+                    <a href="{% url 'tasks_create' %}" class="sidebar__link">
+                        <span class="sidebar__icon">➕</span>
+                        Создать задачу
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar__section">
+            <div class="sidebar__title">Ученики</div>
+            <ul class="sidebar__menu">
+                <li class="sidebar__item">
+                    <a href="{% url 'students_list' %}" class="sidebar__link">
+                        <span class="sidebar__icon">👥</span>
+                        Список учеников
+                    </a>
+                </li>
+                <li class="sidebar__item">
+                    <a href="{% url 'students_groups' %}" class="sidebar__link">
+                        <span class="sidebar__icon">🏫</span>
+                        Группы
+                    </a>
+                </li>
+                <li class="sidebar__item">
+                    <a href="{% url 'students_progress' %}" class="sidebar__link">
+                        <span class="sidebar__icon">📊</span>
+                        Прогресс
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar__section">
+            <div class="sidebar__title">Статистика</div>
+            <ul class="sidebar__menu">
+                <li class="sidebar__item">
+                    <a href="{% url 'stats_overview' %}" class="sidebar__link">
+                        <span class="sidebar__icon">📈</span>
+                        Обзор
+                    </a>
+                </li>
+                <li class="sidebar__item">
+                    <a href="{% url 'stats_reports' %}" class="sidebar__link">
+                        <span class="sidebar__icon">📑</span>
+                        Отчёты
+                    </a>
+                </li>
+                <li class="sidebar__item">
+                    <a href="{% url 'stats_analytics' %}" class="sidebar__link">
+                        <span class="sidebar__icon">🔍</span>
+                        Аналитика
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1>{% block page_title %}Главная страница{% endblock %}</h1>
+            <p>{% block page_description %}Добро пожаловать в образовательную платформу{% endblock %}</p>
+        </div>
+
+        {% block content %}
+        <div class="card">
+            <h2>Добро пожаловать!</h2>
+            <p>Это базовый шаблон Django с красивым дизайном в темно-фиолетовых тонах.</p>
+        </div>
+        {% endblock %}
+    </main>
+
+    <script>
+        // Подсветка активного пункта меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const sidebarLinks = document.querySelectorAll('.sidebar__link');
+
+            sidebarLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

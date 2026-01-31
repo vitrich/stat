@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Регистрация{% endblock %}
+{% block page_description %}Создайте новый аккаунт{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 0 auto;">
+    <h2>Регистрация</h2>
+    {% if messages %}
+        {% for message in messages %}
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 16px; color: var(--color-success);">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="background: var(--color-accent-primary); color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 16px; font-size: 16px; font-weight: 500;">Зарегистрироваться</button>
+    </form>
+    <p style="margin-top: 16px; text-align: center; color: var(--color-text-secondary);">
+        Уже есть аккаунт? <a href="{% url 'login' %}" style="color: var(--color-accent-light); text-decoration: none;">Войдите</a>
+    </p>
+</div>
+{% endblock %}
