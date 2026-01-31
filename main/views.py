@@ -4,6 +4,7 @@ from django.contrib import messages
 from .forms import StudentRegistrationForm
 from .models import GroupHistory, Student, Group
 from collections import defaultdict
+import json
 
 
 def home(request):
@@ -64,10 +65,27 @@ def students_progress(request):
 # Статистика
 @login_required
 def statistics(request):
-    """Статистика переходов между группами"""
+    """Статистика переходов между группами - интерактивный график"""
 
-    # Получаем все переходы
+    # Получаем всю историю
     all_history = GroupHistory.objects.select_related('student', 'group').order_by('student_id', 'transfer_date')
+
+    # Собираем полную историю для каждого ученика
+    students_full_history = defaultdict(list)
+    students_info = {}
+
+    for entry in all_history:
+        student_id = entry.student.id
+        students_full_history[student_id].append({
+            'date': entry.transfer_date.strftime('%Y-%m-%d'),
+            'group': float(entry.group.number),
+            'reason': entry.reason
+        })
+        if student_id not in students_info:
+            students_info[student_id] = {
+                'id': student_id,
+                'name': entry.student.full_name
+            }
 
     # Группируем по датам
     history_by_date = defaultdict(list)
@@ -79,22 +97,18 @@ def statistics(request):
     for entry in all_history:
         students_with_changes[entry.student.id].append(entry)
 
-    # Оставляем только тех, у кого есть переходы
-    transitions = []
+    # Собираем список учеников с переходами
+    students_with_transitions = []
     for student_id, entries in students_with_changes.items():
         if len(entries) > 1:
-            # Сортируем по дате
-            entries_sorted = sorted(entries, key=lambda x: x.transfer_date)
-            for i in range(len(entries_sorted) - 1):
-                old_entry = entries_sorted[i]
-                new_entry = entries_sorted[i + 1]
-                transitions.append({
-                    'student': old_entry.student,
-                    'from_group': old_entry.group,
-                    'to_group': new_entry.group,
-                    'date': new_entry.transfer_date,
-                    'reason': new_entry.reason
-                })
+            students_with_transitions.append({
+                'id': student_id,
+                'name': entries[0].student.full_name,
+                'history': students_full_history[student_id]
+            })
+
+    # Сортируем по имени
+    students_with_transitions.sort(key=lambda x: x['name'])
 
     # Статистика по группам
     groups = Group.objects.all().order_by('number')
@@ -107,18 +121,15 @@ def statistics(request):
             'teacher': group.teacher.full_name if group.teacher else 'Не назначен'
         })
 
-    # Статистика переходов по направлениям
-    transitions_by_direction = defaultdict(int)
-    for t in transitions:
-        key = f"{t['from_group'].number} → {t['to_group'].number}"
-        transitions_by_direction[key] += 1
-
     context = {
-        'history_by_date': dict(history_by_date),
-        'transitions': transitions,
+        'students_with_transitions': students_with_transitions,
+        'students_json': json.dumps({
+            s['id']: {
+                'name': s['name'],
+                'history': s['history']
+            } for s in students_with_transitions
+        }),
         'group_stats': group_stats,
-        'transitions_by_direction': dict(transitions_by_direction),
-        'total_transitions': len(transitions),
     }
 
     return render(request, 'statistics.html', context)
