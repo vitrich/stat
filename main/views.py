@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import StudentRegistrationForm
+from .models import GroupHistory, Student, Group
+from collections import defaultdict
 
 
 def home(request):
@@ -62,7 +64,65 @@ def students_progress(request):
 # Статистика
 @login_required
 def statistics(request):
-    return render(request, 'statistics.html')
+    """Статистика переходов между группами"""
+
+    # Получаем все переходы
+    all_history = GroupHistory.objects.select_related('student', 'group').order_by('transfer_date',
+                                                                                   'student__full_name')
+
+    # Группируем по датам
+    history_by_date = defaultdict(list)
+    for entry in all_history:
+        history_by_date[entry.transfer_date].append(entry)
+
+    # Находим переходы (ученики с более чем 1 записью)
+    students_with_changes = defaultdict(list)
+    for entry in all_history:
+        students_with_changes[entry.student.id].append(entry)
+
+    # Оставляем только тех, у кого есть переходы
+    transitions = []
+    for student_id, entries in students_with_changes.items():
+        if len(entries) > 1:
+            # Сортируем по дате
+            entries_sorted = sorted(entries, key=lambda x: x.transfer_date)
+            for i in range(len(entries_sorted) - 1):
+                old_entry = entries_sorted[i]
+                new_entry = entries_sorted[i + 1]
+                transitions.append({
+                    'student': old_entry.student,
+                    'from_group': old_entry.group,
+                    'to_group': new_entry.group,
+                    'date': new_entry.transfer_date,
+                    'reason': new_entry.reason
+                })
+
+    # Статистика по группам
+    groups = Group.objects.all().order_by('number')
+    group_stats = []
+    for group in groups:
+        current_count = Student.objects.filter(current_group=group).count()
+        group_stats.append({
+            'group': group,
+            'current_count': current_count,
+            'teacher': group.teacher.full_name if group.teacher else 'Не назначен'
+        })
+
+    # Статистика переходов по направлениям
+    transitions_by_direction = defaultdict(int)
+    for t in transitions:
+        key = f"{t['from_group'].number} → {t['to_group'].number}"
+        transitions_by_direction[key] += 1
+
+    context = {
+        'history_by_date': dict(history_by_date),
+        'transitions': transitions,
+        'group_stats': group_stats,
+        'transitions_by_direction': dict(transitions_by_direction),
+        'total_transitions': len(transitions),
+    }
+
+    return render(request, 'statistics.html', context)
 
 
 @login_required
@@ -80,7 +140,7 @@ def stats_analytics(request):
     return render(request, 'statistics.html', {'view': 'analytics'})
 
 
-# Регистрация (ОБНОВЛЕНО)
+# Регистрация
 def register(request):
     if request.method == 'POST':
         form = StudentRegistrationForm(request.POST)
