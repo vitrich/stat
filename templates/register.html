@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block page_title %}Регистрация{% endblock %}
-{% block page_description %}Создайте новый аккаунт{% endblock %}
+{% block page_description %}Создайте учётную запись{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 500px; margin: 0 auto;">
-    <h2 style="color: var(--color-accent-light); margin-bottom: 24px;">Регистрация</h2>
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: var(--color-accent-light); margin-bottom: 24px;">Регистрация ученика</h2>
 
     {% if messages %}
         {% for message in messages %}
@@ -15,7 +15,16 @@
         {% endfor %}
     {% endif %}
 
-    <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+    <div style="background: rgba(189, 46, 141, 0.1); border: 1px solid var(--color-border); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+        <h3 style="color: var(--color-gold); font-size: 16px; margin-bottom: 8px;">📋 Инструкция:</h3>
+        <ol style="color: var(--color-text-secondary); margin: 0; padding-left: 24px; line-height: 1.8;">
+            <li>Найдите себя в списке</li>
+            <li>Придумайте логин и пароль</li>
+            <li>Нажмите "Зарегистрироваться"</li>
+        </ol>
+    </div>
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 24px;">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -24,41 +33,44 @@
         </div>
         {% endif %}
 
+        <!-- Выбор ученика из списка -->
+        <div>
+            <label for="{{ form.student.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
+                {{ form.student.label }}
+            </label>
+            {{ form.student }}
+            {% if form.student.errors %}
+            <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
+                {{ form.student.errors.0 }}
+            </div>
+            {% endif %}
+            <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
+                {{ form.student.help_text }}
+            </div>
+        </div>
+
         <!-- Имя пользователя -->
         <div>
             <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                Имя пользователя
+                {{ form.username.label }}
             </label>
-            <input
-                type="text"
-                name="{{ form.username.name }}"
-                id="{{ form.username.id_for_label }}"
-                value="{{ form.username.value|default:'' }}"
-                style="width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;"
-                required
-            >
+            {{ form.username }}
             {% if form.username.errors %}
             <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
                 {{ form.username.errors.0 }}
             </div>
             {% endif %}
             <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
-                Обязательное поле. Не более 150 символов. Только буквы, цифры и @/./+/-/_
+                {{ form.username.help_text }}
             </div>
         </div>
 
         <!-- Пароль -->
         <div>
             <label for="{{ form.password1.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                Пароль
+                {{ form.password1.label }}
             </label>
-            <input
-                type="password"
-                name="{{ form.password1.name }}"
-                id="{{ form.password1.id_for_label }}"
-                style="width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;"
-                required
-            >
+            {{ form.password1 }}
             {% if form.password1.errors %}
             <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
                 {{ form.password1.errors.0 }}
@@ -72,15 +84,9 @@
         <!-- Подтверждение пароля -->
         <div>
             <label for="{{ form.password2.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                Подтверждение пароля
+                {{ form.password2.label }}
             </label>
-            <input
-                type="password"
-                name="{{ form.password2.name }}"
-                id="{{ form.password2.id_for_label }}"
-                style="width: 100%; padding: 12px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); font-size: 15px;"
-                required
-            >
+            {{ form.password2 }}
             {% if form.password2.errors %}
             <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
                 {{ form.password2.errors.0 }}
@@ -93,9 +99,9 @@
 
         <button
             type="submit"
-            style="background: var(--color-accent-primary); color: white; padding: 14px 24px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: all 0.3s ease;"
-            onmouseover="this.style.background='var(--color-accent-hover)'"
-            onmouseout="this.style.background='var(--color-accent-primary)'"
+            style="background: linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-burgundy) 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(189, 46, 141, 0.3);"
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(189, 46, 141, 0.5)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(189, 46, 141, 0.3)'"
         >
             Зарегистрироваться
         </button>
@@ -112,10 +118,20 @@
 </div>
 
 <style>
-    input:focus {
+    select:focus, input:focus {
         outline: none;
-        border-color: var(--color-accent-primary);
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        border-color: var(--color-accent-primary) !important;
+        box-shadow: 0 0 0 3px rgba(189, 46, 141, 0.2);
+    }
+
+    select {
+        cursor: pointer;
+    }
+
+    select option {
+        background: var(--color-bg-secondary);
+        color: var(--color-text-primary);
+        padding: 10px;
     }
 </style>
 {% endblock %}
