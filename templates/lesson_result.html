@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Результаты - {{ lesson.title }}{% endblock %}
+{% block page_description %}Ваши результаты выполнения теста{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ lesson.title }}</h1>
+            <p class="text-gray-600">{{ lesson.date|date:"d.m.Y" }}</p>
+        </div>
+        
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div>
+                    <p class="text-gray-600 mb-2">Ваша оценка</p>
+                    <p class="text-5xl font-bold {% if lesson_task.score >= 5 %}text-green-600{% elif lesson_task.score >= 3 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        {{ lesson_task.score }}
+                    </p>
+                    <p class="text-gray-500 text-sm mt-1">из 7 баллов</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 mb-2">Правильных ответов</p>
+                    <p class="text-5xl font-bold text-blue-600">
+                        {{ lesson_task.correct_count }}
+                    </p>
+                    <p class="text-gray-500 text-sm mt-1">из {{ lesson_task.total_count }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 mb-2">Процент выполнения</p>
+                    <p class="text-5xl font-bold text-purple-600">
+                        {{ lesson_task.correct_count|floatformat:0|add:"0"|mul:100|div:lesson_task.total_count|floatformat:0 }}%
+                    </p>
+                    <p class="text-gray-500 text-sm mt-1">успешности</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-4">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Детальные результаты:</h2>
+            
+            {% for result in results %}
+            <div class="border rounded-lg p-4 {% if result.is_correct %}bg-green-50 border-green-200{% else %}bg-red-50 border-red-200{% endif %}">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <p class="font-semibold mb-2">Задание {{ forloop.counter }}:</p>
+                        
+                        {% with task=result.task %}
+                        {% if task.type == 'classify' %}
+                        <p class="mb-2">Тип дроби: 
+                            <span class="text-xl font-bold">
+                                <sup>{{ task.numerator }}</sup>/<sub>{{ task.denominator }}</sub>
+                            </span>
+                        </p>
+                        
+                        {% elif task.type == 'mixed_to_improper' %}
+                        <p class="mb-2">Смешанная → неправильная: 
+                            <span class="text-xl font-bold">
+                                {{ task.whole }} <sup>{{ task.numerator }}</sup>/<sub>{{ task.denominator }}</sub>
+                            </span>
+                        </p>
+                        
+                        {% elif task.type == 'improper_to_mixed' %}
+                        <p class="mb-2">Неправильная → смешанная: 
+                            <span class="text-xl font-bold">
+                                <sup>{{ task.numerator }}</sup>/<sub>{{ task.denominator }}</sub>
+                            </span>
+                        </p>
+                        {% endif %}
+                        {% endwith %}
+                        
+                        <div class="mt-3">
+                            <p class="text-sm"><strong>Ваш ответ:</strong> 
+                                <span class="font-mono">{{ result.user_answer|default:"(не дан)" }}</span>
+                            </p>
+                            {% if not result.is_correct %}
+                            <p class="text-sm text-red-700"><strong>Правильный ответ:</strong> 
+                                <span class="font-mono">{{ result.correct_answer }}</span>
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="ml-4">
+                        {% if result.is_correct %}
+                        <span class="text-3xl">✅</span>
+                        {% else %}
+                        <span class="text-3xl">❌</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-8 text-center">
+            <a href="{% url 'home' %}" 
+               class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200">
+                Вернуться на главную
+            </a>
+        </div>
+    </div>
+    
+</div>
+
+{% load mathfilters %}
+{% endblock %}

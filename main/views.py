@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 from .forms import StudentRegistrationForm
-from .models import GroupHistory, Student, Group
+from .models import GroupHistory, Student, Group, Lesson, LessonTask
 from collections import defaultdict
 import json
 from datetime import date
@@ -19,6 +20,109 @@ def news(request):
 
 def news_archive(request):
     return render(request, 'news.html', {'archive': True})
+
+
+# Уроки математики
+@login_required
+def lesson_view(request, lesson_date):
+    """Просмотр урока и выполнение заданий"""
+    try:
+        # Получаем урок по дате
+        lesson = get_object_or_404(Lesson, date=lesson_date, is_active=True)
+
+        # Получаем ученика
+        try:
+            student = request.user.student
+        except Student.DoesNotExist:
+            messages.error(request, 'Ваш профиль ученика не найден.')
+            return redirect('home')
+
+        # Получаем или создаем задание для ученика
+        lesson_task, created = LessonTask.objects.get_or_create(
+            lesson=lesson,
+            student=student
+        )
+
+        # Если задание новое, генерируем задачи
+        if created or not lesson_task.tasks_data:
+            lesson_task.generate_tasks()
+
+        # Загружаем задания
+        tasks = json.loads(lesson_task.tasks_data)
+
+        # Обработка отправки формы
+        if request.method == 'POST':
+            if lesson_task.submitted_at:
+                messages.warning(request, 'Вы уже сдали этот тест!')
+                return redirect('lesson_result', lesson_date=lesson_date)
+
+            # Собираем ответы
+            answers = {}
+            for i in range(len(tasks)):
+                answer = request.POST.get(f'answer_{i}', '').strip()
+                answers[str(i)] = answer
+
+            # Проверяем и выставляем оценку
+            score = lesson_task.check_answers(answers)
+
+            messages.success(request, f'Тест сдан! Ваша оценка: {score} из 7')
+            return redirect('lesson_result', lesson_date=lesson_date)
+
+        context = {
+            'lesson': lesson,
+            'lesson_task': lesson_task,
+            'tasks': tasks,
+            'already_submitted': lesson_task.submitted_at is not None
+        }
+
+        return render(request, 'lesson.html', context)
+
+    except Exception as e:
+        messages.error(request, f'Ошибка загрузки урока: {str(e)}')
+        return redirect('home')
+
+
+@login_required
+def lesson_result(request, lesson_date):
+    """Результаты выполнения урока"""
+    lesson = get_object_or_404(Lesson, date=lesson_date)
+
+    try:
+        student = request.user.student
+    except Student.DoesNotExist:
+        messages.error(request, 'Ваш профиль ученика не найден.')
+        return redirect('home')
+
+    lesson_task = get_object_or_404(LessonTask, lesson=lesson, student=student)
+
+    if not lesson_task.submitted_at:
+        messages.warning(request, 'Сначала выполните тест!')
+        return redirect('lesson_view', lesson_date=lesson_date)
+
+    tasks = json.loads(lesson_task.tasks_data)
+    answers = json.loads(lesson_task.answers) if lesson_task.answers else {}
+
+    # Формируем детальные результаты
+    results = []
+    for i, task in enumerate(tasks):
+        user_answer = answers.get(str(i), '')
+        correct_answer = task['answer']
+        is_correct = user_answer.strip().lower() == correct_answer.strip().lower()
+
+        results.append({
+            'task': task,
+            'user_answer': user_answer,
+            'correct_answer': correct_answer,
+            'is_correct': is_correct
+        })
+
+    context = {
+        'lesson': lesson,
+        'lesson_task': lesson_task,
+        'results': results
+    }
+
+    return render(request, 'lesson_result.html', context)
 
 
 # Задачи
@@ -106,7 +210,6 @@ def statistics(request):
 
     # Дополняем историю промежуточными точками
     students_full_history = {}
-
     for student_id, history in students_history_raw.items():
         # Сортируем по дате
         history_sorted = sorted(history, key=lambda x: x['date'])
@@ -161,6 +264,7 @@ def statistics(request):
     # Статистика по группам
     groups = Group.objects.all().order_by('number')
     group_stats = []
+
     for group in groups:
         current_count = Student.objects.filter(current_group=group).count()
         group_stats.append({
@@ -181,8 +285,8 @@ def statistics(request):
             } for s in students_with_transitions
         }),
         'group_stats': group_stats,
-        'key_dates': dates_formatted,  # Передаем даты в шаблон
-        'dates_count': len(key_dates),  # Количество дат
+        'key_dates': dates_formatted,
+        'dates_count': len(key_dates),
     }
 
     return render(request, 'statistics.html', context)
