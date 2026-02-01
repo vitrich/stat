@@ -3,15 +3,29 @@
 {% block page_title %}Результаты - {{ lesson.title }}{% endblock %}
 {% block page_description %}Ваши результаты выполнения теста{% endblock %}
 
+{% block extra_head %}
+<!-- MathJax для рендеринга LaTeX -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']]
+    }
+  };
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    
+
     <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ lesson.title }}</h1>
             <p class="text-gray-600">{{ lesson.date|date:"d.m.Y" }}</p>
         </div>
-        
+
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div>
@@ -31,58 +45,58 @@
                 <div>
                     <p class="text-gray-600 mb-2">Процент выполнения</p>
                     <p class="text-5xl font-bold text-purple-600">
-                        {{ lesson_task.correct_count|floatformat:0|add:"0"|mul:100|div:lesson_task.total_count|floatformat:0 }}%
+                        {% widthratio lesson_task.correct_count lesson_task.total_count 100 %}%
                     </p>
                     <p class="text-gray-500 text-sm mt-1">успешности</p>
                 </div>
             </div>
         </div>
-        
+
         <div class="space-y-4">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Детальные результаты:</h2>
-            
+
             {% for result in results %}
             <div class="border rounded-lg p-4 {% if result.is_correct %}bg-green-50 border-green-200{% else %}bg-red-50 border-red-200{% endif %}">
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
                         <p class="font-semibold mb-2">Задание {{ forloop.counter }}:</p>
-                        
+
                         {% with task=result.task %}
                         {% if task.type == 'classify' %}
-                        <p class="mb-2">Тип дроби: 
+                        <p class="mb-2">Тип дроби:
                             <span class="text-xl font-bold">
-                                <sup>{{ task.numerator }}</sup>/<sub>{{ task.denominator }}</sub>
+                                \(\frac{ {{task.numerator}} }{ {{task.denominator}} }\)
                             </span>
                         </p>
-                        
+
                         {% elif task.type == 'mixed_to_improper' %}
-                        <p class="mb-2">Смешанная → неправильная: 
+                        <p class="mb-2">Смешанная → неправильная:
                             <span class="text-xl font-bold">
-                                {{ task.whole }} <sup>{{ task.numerator }}</sup>/<sub>{{ task.denominator }}</sub>
+                                \({{ task.whole }}\frac{ {{task.numerator}} }{ {{task.denominator}} }\)
                             </span>
                         </p>
-                        
+
                         {% elif task.type == 'improper_to_mixed' %}
-                        <p class="mb-2">Неправильная → смешанная: 
+                        <p class="mb-2">Неправильная → смешанная:
                             <span class="text-xl font-bold">
-                                <sup>{{ task.numerator }}</sup>/<sub>{{ task.denominator }}</sub>
+                                \(\frac{ {{task.numerator}} }{ {{task.denominator}} }\)
                             </span>
                         </p>
                         {% endif %}
                         {% endwith %}
-                        
+
                         <div class="mt-3">
-                            <p class="text-sm"><strong>Ваш ответ:</strong> 
+                            <p class="text-sm"><strong>Ваш ответ:</strong>
                                 <span class="font-mono">{{ result.user_answer|default:"(не дан)" }}</span>
                             </p>
                             {% if not result.is_correct %}
-                            <p class="text-sm text-red-700"><strong>Правильный ответ:</strong> 
+                            <p class="text-sm text-red-700"><strong>Правильный ответ:</strong>
                                 <span class="font-mono">{{ result.correct_answer }}</span>
                             </p>
                             {% endif %}
                         </div>
                     </div>
-                    
+
                     <div class="ml-4">
                         {% if result.is_correct %}
                         <span class="text-3xl">✅</span>
@@ -94,16 +108,23 @@
             </div>
             {% endfor %}
         </div>
-        
+
         <div class="mt-8 text-center">
-            <a href="{% url 'home' %}" 
+            <a href="{% url 'home' %}"
                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200">
                 Вернуться на главную
             </a>
         </div>
     </div>
-    
+
 </div>
 
-{% load mathfilters %}
+<script>
+// Принудительно обновить MathJax после загрузки страницы
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof MathJax !== 'undefined') {
+        MathJax.typesetPromise();
+    }
+});
+</script>
 {% endblock %}
