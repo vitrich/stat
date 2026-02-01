@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('main', '0002_auto_20260101_0000'),  # Замените на реальную предыдущую миграцию
+        ('main', '0002_auto_update_student'),  # <- вставить эту строку
     ]
 
     operations = [
