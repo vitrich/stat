@@ -10,7 +10,34 @@ from datetime import date
 
 
 def home(request):
-    return render(request, 'home.html')
+    context = {}
+
+    # Если пользователь авторизован и является учеником
+    if request.user.is_authenticated:
+        try:
+            student = request.user.student
+
+            # Получаем все активные уроки
+            lessons = Lesson.objects.filter(is_active=True).order_by('-date')
+
+            # Проверяем статус выполнения каждого урока
+            lessons_with_status = []
+            for lesson in lessons:
+                try:
+                    lesson_task = LessonTask.objects.get(lesson=lesson, student=student)
+                    lesson.completed = lesson_task.submitted_at is not None
+                except LessonTask.DoesNotExist:
+                    lesson.completed = False
+
+                lessons_with_status.append(lesson)
+
+            context['lessons'] = lessons_with_status
+
+        except Student.DoesNotExist:
+            # Пользователь не ученик (возможно, преподаватель)
+            pass
+
+    return render(request, 'home.html', context)
 
 
 # Новости
