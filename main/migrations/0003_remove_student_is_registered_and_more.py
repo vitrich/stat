@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         # Закомментируйте или удалите операции удаления полей
         # migrations.RemoveField(
         #     model_name='student',
-        #     name='is_registered',
+        #     name='is_registered',hihi
         # ),
         # migrations.RemoveField(
         #     model_name='student',
