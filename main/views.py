@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from .forms import StudentRegistrationForm
-from .models import GroupHistory, Student, Group, Lesson, LessonTask
+from .models import GroupHistory, Student, Group, Lesson, LessonTask, Teacher
 from collections import defaultdict
 import json
 from datetime import date
@@ -167,10 +167,23 @@ def students_progress(request):
     return render(request, 'students.html', {'view': 'progress'})
 
 
-# Статистика
+# Проверка: является ли пользователь преподавателем
+def is_teacher(user):
+    try:
+        return hasattr(user, 'teacher_profile')
+    except:
+        return False
+
+
+# Статистика - ТОЛЬКО ДЛЯ ПРЕПОДАВАТЕЛЕЙ
 @login_required
 def statistics(request):
-    """Статистика переходов между группами - интерактивный график"""
+    """Статистика переходов между группами - интерактивный график (только для преподавателей)"""
+
+    # Проверка прав доступа
+    if not is_teacher(request.user):
+        messages.error(request, 'У вас нет доступа к этому разделу. Статистика доступна только преподавателям.')
+        return redirect('home')
 
     # АВТОМАТИЧЕСКИ ОПРЕДЕЛЯЕМ ВСЕ УНИКАЛЬНЫЕ ДАТЫ ИЗ БД
     key_dates = list(
@@ -294,16 +307,28 @@ def statistics(request):
 
 @login_required
 def stats_overview(request):
+    # Проверка прав доступа
+    if not is_teacher(request.user):
+        messages.error(request, 'У вас нет доступа к этому разделу.')
+        return redirect('home')
     return render(request, 'statistics.html', {'view': 'overview'})
 
 
 @login_required
 def stats_reports(request):
+    # Проверка прав доступа
+    if not is_teacher(request.user):
+        messages.error(request, 'У вас нет доступа к этому разделу.')
+        return redirect('home')
     return render(request, 'statistics.html', {'view': 'reports'})
 
 
 @login_required
 def stats_analytics(request):
+    # Проверка прав доступа
+    if not is_teacher(request.user):
+        messages.error(request, 'У вас нет доступа к этому разделу.')
+        return redirect('home')
     return render(request, 'statistics.html', {'view': 'analytics'})
 
 

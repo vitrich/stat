@@ -284,7 +284,7 @@
             <nav class="top-nav">
                 <a href="{% url 'home' %}" class="top-nav-link {% if request.path == '/' %}active{% endif %}">Главная</a>
                 <a href="{% url 'news' %}" class="top-nav-link {% if 'news' in request.path %}active{% endif %}">Новости</a>
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated and user.teacher_profile %}
                 <a href="{% url 'statistics' %}" class="top-nav-link {% if 'statistics' in request.path %}active{% endif %}">Статистика</a>
                 {% endif %}
             </nav>
@@ -335,6 +335,7 @@
                 </ul>
             </div>
 
+            {% if user.teacher_profile %}
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Статистика</div>
                 <ul class="sidebar-menu">
@@ -344,6 +345,7 @@
                     <li><a href="{% url 'stats_analytics' %}" class="sidebar-link">📈 Аналитика</a></li>
                 </ul>
             </div>
+            {% endif %}
         </aside>
         {% endif %}
 
