@@ -118,76 +118,15 @@
             color: var(--color-text);
         }
 
-        /* Layout with Sidebar */
-        .layout {
-            display: flex;
-            flex: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Left Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: var(--color-surface);
-            border-right: 1px solid var(--color-border);
-            padding: 2rem 0;
-            position: sticky;
-            top: 0;
-            height: calc(100vh - 70px);
-            overflow-y: auto;
-        }
-
-        .sidebar-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .sidebar-section-title {
-            padding: 0 1.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            color: var(--color-text-light);
-            letter-spacing: 0.05em;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 0.25rem;
-        }
-
-        .sidebar-link {
-            display: block;
-            padding: 0.75rem 1.5rem;
-            color: var(--color-text);
-            text-decoration: none;
-            transition: all 0.2s;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .sidebar-link:hover {
-            background-color: var(--color-bg);
-            color: var(--color-primary);
-        }
-
-        .sidebar-link.active {
-            background-color: #eff6ff;
-            color: var(--color-primary);
-            border-left: 3px solid var(--color-primary);
-        }
-
         /* Main Content */
         .main-content {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
             background-color: var(--color-bg);
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         /* Messages */
@@ -259,10 +198,6 @@
 
         /* Mobile */
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-
             .top-nav {
                 display: none;
             }
@@ -304,74 +239,28 @@
         </div>
     </header>
 
-    <div class="layout">
-        <!-- Left Sidebar -->
-        {% if user.is_authenticated %}
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <div class="sidebar-section-title">Новости</div>
-                <ul class="sidebar-menu">
-                    <li><a href="{% url 'news' %}" class="sidebar-link {% if request.path == '/news/' %}active{% endif %}">📋 Все новости</a></li>
-                    <li><a href="{% url 'news_archive' %}" class="sidebar-link {% if request.path == '/news/archive/' %}active{% endif %}">📦 Архив</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="sidebar-section-title">Задачи</div>
-                <ul class="sidebar-menu">
-                    <li><a href="{% url 'tasks' %}" class="sidebar-link">📝 Все задачи</a></li>
-                    <li><a href="{% url 'tasks_active' %}" class="sidebar-link">⏳ Активные</a></li>
-                    <li><a href="{% url 'tasks_completed' %}" class="sidebar-link">✅ Выполненные</a></li>
-                    <li><a href="{% url 'tasks_create' %}" class="sidebar-link">➕ Создать задачу</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="sidebar-section-title">Ученики</div>
-                <ul class="sidebar-menu">
-                    <li><a href="{% url 'students' %}" class="sidebar-link">👥 Список учеников</a></li>
-                    <li><a href="{% url 'students_groups' %}" class="sidebar-link">📊 По группам</a></li>
-                    <li><a href="{% url 'students_progress' %}" class="sidebar-link">📈 Прогресс</a></li>
-                </ul>
-            </div>
-
-            {% if user.teacher_profile %}
-            <div class="sidebar-section">
-                <div class="sidebar-section-title">Статистика</div>
-                <ul class="sidebar-menu">
-                    <li><a href="{% url 'statistics' %}" class="sidebar-link {% if request.path == '/statistics/' %}active{% endif %}">📊 Переходы групп</a></li>
-                    <li><a href="{% url 'stats_overview' %}" class="sidebar-link">📋 Обзор</a></li>
-                    <li><a href="{% url 'stats_reports' %}" class="sidebar-link">📄 Отчёты</a></li>
-                    <li><a href="{% url 'stats_analytics' %}" class="sidebar-link">📈 Аналитика</a></li>
-                </ul>
-            </div>
-            {% endif %}
-        </aside>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
         {% endif %}
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+        <!-- Page Title -->
+        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--color-text);">
+            {% block page_title %}Добро пожаловать{% endblock %}
+        </h1>
 
-            <!-- Page Title -->
-            <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--color-text);">
-                {% block page_title %}Добро пожаловать{% endblock %}
-            </h1>
-
-            <!-- Content -->
-            {% block content %}
-            {% endblock %}
-        </main>
-    </div>
+        <!-- Content -->
+        {% block content %}
+        {% endblock %}
+    </main>
 
     <!-- Scripts -->
     <script>
