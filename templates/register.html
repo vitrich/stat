@@ -1,137 +1,333 @@
 {% extends 'base.html' %}
 
 {% block page_title %}Регистрация{% endblock %}
+
 {% block page_description %}Создайте учётную запись{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 600px; margin: 0 auto;">
-    <h2 style="color: var(--color-accent-light); margin-bottom: 24px;">Регистрация ученика</h2>
+<style>
+    .auth-container {
+        max-width: 420px;
+        margin: 3rem auto;
+        padding: 0;
+    }
 
-    {% if messages %}
-        {% for message in messages %}
-        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 16px; color: var(--color-success);">
-            {{ message }}
+    .auth-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        padding: 2.5rem;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .form-input,
+    .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: white;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: #1976D2;
+        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+    }
+
+    .form-select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23334155' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 2.5rem;
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.375rem;
+        line-height: 1.4;
+    }
+
+    .error-message {
+        font-size: 0.85rem;
+        color: #dc2626;
+        margin-top: 0.375rem;
+    }
+
+    .form-errors {
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+        color: #991b1b;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-errors ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-errors li {
+        margin-bottom: 0.5rem;
+    }
+
+    .form-errors li:last-child {
+        margin-bottom: 0;
+    }
+
+    /* ИСПРАВЛЕННАЯ КНОПКА С ЯВНЫМИ ЦВЕТАМИ */
+    .btn-submit {
+        width: 100%;
+        padding: 0.875rem;
+        background: #1976D2 !important;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        background: #1565C0 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .auth-footer-text {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+        color: #1976D2;
+        text-decoration: none;
+        font-weight: 600;
+        margin-left: 0.25rem;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .instruction-box {
+        background: #fef3c7;
+        border: 1px solid #fde047;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .instruction-box h3 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #92400e;
+        margin-bottom: 0.5rem;
+    }
+
+    .instruction-box ol {
+        margin: 0;
+        padding-left: 1.25rem;
+        color: #92400e;
+    }
+
+    .instruction-box li {
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>📐 Регистрация ученика</h2>
+            <p>Создайте аккаунт для доступа к урокам</p>
         </div>
-        {% endfor %}
-    {% endif %}
 
-    <div style="background: rgba(189, 46, 141, 0.1); border: 1px solid var(--color-border); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-        <h3 style="color: var(--color-gold); font-size: 16px; margin-bottom: 8px;">📋 Инструкция:</h3>
-        <ol style="color: var(--color-text-secondary); margin: 0; padding-left: 24px; line-height: 1.8;">
-            <li>Найдите себя в списке</li>
-            <li>Придумайте логин и пароль</li>
-            <li>Нажмите "Зарегистрироваться"</li>
-        </ol>
-    </div>
-
-    <form method="post" style="display: flex; flex-direction: column; gap: 24px;">
-        {% csrf_token %}
+        <div class="instruction-box">
+            <h3>📋 Инструкция:</h3>
+            <ol>
+                <li>Найдите себя в списке</li>
+                <li>Придумайте логин и пароль</li>
+                <li>Нажмите "Зарегистрироваться"</li>
+            </ol>
+        </div>
 
         {% if form.non_field_errors %}
-        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 12px; border-radius: 8px; color: var(--color-danger);">
-            {{ form.non_field_errors }}
+        <div class="form-errors">
+            <ul>
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
         </div>
         {% endif %}
 
-        <!-- Выбор ученика из списка -->
-        <div>
-            <label for="{{ form.student.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                {{ form.student.label }}
-            </label>
-            {{ form.student }}
-            {% if form.student.errors %}
-            <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
-                {{ form.student.errors.0 }}
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.student.id_for_label }}" class="form-label">
+                    Выберите ученика
+                </label>
+                <select
+                    name="{{ form.student.name }}"
+                    id="{{ form.student.id_for_label }}"
+                    class="form-select"
+                    required
+                >
+                    <option value="">--- Выберите ---</option>
+                    {% for value, label in form.student.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.student.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                {% if form.student.help_text %}
+                <div class="help-text">{{ form.student.help_text }}</div>
+                {% endif %}
+                {% if form.student.errors %}
+                <div class="error-message">
+                    {% for error in form.student.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
-            <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
-                {{ form.student.help_text }}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}" class="form-label">
+                    Имя пользователя
+                </label>
+                <input
+                    type="text"
+                    name="{{ form.username.name }}"
+                    id="{{ form.username.id_for_label }}"
+                    class="form-input"
+                    value="{{ form.username.value|default:'' }}"
+                    placeholder="Введите логин"
+                    required
+                >
+                {% if form.username.help_text %}
+                <div class="help-text">{{ form.username.help_text }}</div>
+                {% endif %}
+                {% if form.username.errors %}
+                <div class="error-message">
+                    {% for error in form.username.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                    Пароль
+                </label>
+                <input
+                    type="password"
+                    name="{{ form.password1.name }}"
+                    id="{{ form.password1.id_for_label }}"
+                    class="form-input"
+                    placeholder="Введите пароль"
+                    required
+                >
+                {% if form.password1.help_text %}
+                <div class="help-text">{{ form.password1.help_text }}</div>
+                {% endif %}
+                {% if form.password1.errors %}
+                <div class="error-message">
+                    {% for error in form.password1.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                    Подтверждение пароля
+                </label>
+                <input
+                    type="password"
+                    name="{{ form.password2.name }}"
+                    id="{{ form.password2.id_for_label }}"
+                    class="form-input"
+                    placeholder="Повторите пароль"
+                    required
+                >
+                {% if form.password2.help_text %}
+                <div class="help-text">{{ form.password2.help_text }}</div>
+                {% endif %}
+                {% if form.password2.errors %}
+                <div class="error-message">
+                    {% for error in form.password2.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Зарегистрироваться
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <span class="auth-footer-text">Уже есть аккаунт?</span>
+            <a href="{% url 'login' %}">Войдите</a>
         </div>
-
-        <!-- Имя пользователя -->
-        <div>
-            <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                {{ form.username.label }}
-            </label>
-            {{ form.username }}
-            {% if form.username.errors %}
-            <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
-                {{ form.username.errors.0 }}
-            </div>
-            {% endif %}
-            <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
-                {{ form.username.help_text }}
-            </div>
-        </div>
-
-        <!-- Пароль -->
-        <div>
-            <label for="{{ form.password1.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                {{ form.password1.label }}
-            </label>
-            {{ form.password1 }}
-            {% if form.password1.errors %}
-            <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
-                {{ form.password1.errors.0 }}
-            </div>
-            {% endif %}
-            <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
-                Можно использовать любой пароль
-            </div>
-        </div>
-
-        <!-- Подтверждение пароля -->
-        <div>
-            <label for="{{ form.password2.id_for_label }}" style="display: block; margin-bottom: 8px; color: var(--color-text-secondary); font-weight: 500;">
-                {{ form.password2.label }}
-            </label>
-            {{ form.password2 }}
-            {% if form.password2.errors %}
-            <div style="color: var(--color-danger); font-size: 13px; margin-top: 6px;">
-                {{ form.password2.errors.0 }}
-            </div>
-            {% endif %}
-            <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
-                Введите тот же пароль для подтверждения
-            </div>
-        </div>
-
-        <button
-            type="submit"
-            style="background: linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-burgundy) 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(189, 46, 141, 0.3);"
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(189, 46, 141, 0.5)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(189, 46, 141, 0.3)'"
-        >
-            Зарегистрироваться
-        </button>
-    </form>
-
-    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border); text-align: center;">
-        <p style="color: var(--color-text-secondary); margin: 0;">
-            Уже есть аккаунт?
-            <a href="{% url 'login' %}" style="color: var(--color-accent-light); text-decoration: none; font-weight: 500; transition: color 0.3s ease;">
-                Войдите
-            </a>
-        </p>
     </div>
 </div>
-
-<style>
-    select:focus, input:focus {
-        outline: none;
-        border-color: var(--color-accent-primary) !important;
-        box-shadow: 0 0 0 3px rgba(189, 46, 141, 0.2);
-    }
-
-    select {
-        cursor: pointer;
-    }
-
-    select option {
-        background: var(--color-bg-secondary);
-        color: var(--color-text-primary);
-        padding: 10px;
-    }
-</style>
 {% endblock %}
