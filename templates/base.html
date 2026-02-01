@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block page_title %}Образовательная платформа{% endblock %}</title>
+    <title>{% block title %}Образовательная платформа{% endblock %}</title>
     <meta name="description" content="{% block page_description %}Образовательная платформа{% endblock %}">
 
     <!-- Tailwind CSS -->
@@ -149,6 +149,12 @@
             align-items: center;
         }
 
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -277,7 +283,7 @@
         <div class="main-content">
             <!-- Header -->
             <header class="header">
-                <h1 style="font-size: 1.25rem; font-weight: 600;">{% block page_title %}Образовательная платформа{% endblock %}</h1>
+                <h1 class="page-title">{% block page_title %}Образовательная платформа{% endblock %}</h1>
 
                 <div class="user-info">
                     {% if user.is_authenticated %}
