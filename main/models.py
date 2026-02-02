@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 import json
 import random
+from fractions import Fraction
 
 
 class Teacher(models.Model):
@@ -83,11 +84,9 @@ class Lesson(models.Model):
     date = models.DateField(verbose_name='Дата урока')
     subject = models.CharField(max_length=100, default='Математика', verbose_name='Предмет')
     grade = models.CharField(max_length=20, default='5', verbose_name='Класс')
-
     theory_content = models.TextField(verbose_name='Теоретический материал (HTML)')
     duration_minutes = models.IntegerField(default=40, verbose_name='Длительность урока (минут)')
     test_duration_minutes = models.IntegerField(default=5, verbose_name='Время на тест (минут)')
-
     is_active = models.BooleanField(default=True, verbose_name='Активен')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -120,7 +119,6 @@ class LessonTask(models.Model):
     )
     correct_count = models.IntegerField(default=0, verbose_name='Правильных ответов')
     total_count = models.IntegerField(default=10, verbose_name='Всего заданий')
-
     submitted_at = models.DateTimeField(null=True, blank=True, verbose_name='Время сдачи')
 
     class Meta:
@@ -133,8 +131,24 @@ class LessonTask(models.Model):
 
     def generate_tasks(self):
         """Генерация индивидуальных заданий"""
-        tasks = []
+        # Определяем тип урока по дате или названию
+        lesson_date_str = str(self.lesson.date)
+        
+        if '2026-02-03' in lesson_date_str or 'сравнение' in self.lesson.title.lower():
+            # УРОК 2: Сравнение и сокращение дробей
+            tasks = self._generate_comparison_tasks()
+        else:
+            # УРОК 1: Смешанные и неправильные дроби (по умолчанию)
+            tasks = self._generate_mixed_fraction_tasks()
+        
+        self.tasks_data = json.dumps(tasks, ensure_ascii=False)
+        self.total_count = len(tasks)
+        self.save()
 
+    def _generate_mixed_fraction_tasks(self):
+        """Генерация заданий для урока 1: смешанные и неправильные дроби"""
+        tasks = []
+        
         # 3 задания на классификацию (правильная/неправильная)
         for _ in range(3):
             numerator = random.randint(1, 20)
@@ -172,29 +186,143 @@ class LessonTask(models.Model):
                 'denominator': denominator,
                 'answer': f"{whole} {numerator}/{denominator}"
             })
+        
+        return tasks
 
-        self.tasks_data = json.dumps(tasks, ensure_ascii=False)
-        self.total_count = len(tasks)
-        self.save()
+    def _generate_comparison_tasks(self):
+        """Генерация заданий для урока 2: сравнение и сокращение дробей"""
+        tasks = []
+        
+        # 3 задания на сокращение дробей
+        for _ in range(3):
+            # Выбираем общий делитель
+            gcd_value = random.choice([2, 3, 4, 5, 6])
+            # Генерируем несокращённую дробь
+            numerator_reduced = random.randint(1, 8)
+            denominator_reduced = random.randint(numerator_reduced + 1, 12)
+            
+            numerator = numerator_reduced * gcd_value
+            denominator = denominator_reduced * gcd_value
+            
+            tasks.append({
+                'type': 'reduce',
+                'numerator': numerator,
+                'denominator': denominator,
+                'answer': f"{numerator_reduced}/{denominator_reduced}"
+            })
+
+        # 3 задания на сравнение дробей с одинаковым знаменателем
+        for _ in range(3):
+            denominator = random.randint(5, 15)
+            num1 = random.randint(1, denominator - 1)
+            num2 = random.randint(1, denominator - 1)
+            while num1 == num2:
+                num2 = random.randint(1, denominator - 1)
+            
+            if num1 > num2:
+                answer = ">"
+            elif num1 < num2:
+                answer = "<"
+            else:
+                answer = "="
+            
+            tasks.append({
+                'type': 'compare_same_denom',
+                'numerator1': num1,
+                'denominator1': denominator,
+                'numerator2': num2,
+                'denominator2': denominator,
+                'answer': answer
+            })
+
+        # 3 задания на сравнение дробей с разными знаменателями
+        for _ in range(3):
+            # Используем простые знаменатели для простоты
+            denominators = [2, 3, 4, 5, 6, 8, 10, 12]
+            denom1 = random.choice(denominators)
+            denom2 = random.choice([d for d in denominators if d != denom1])
+            
+            num1 = random.randint(1, denom1 - 1)
+            num2 = random.randint(1, denom2 - 1)
+            
+            # Используем Fraction для точного сравнения
+            frac1 = Fraction(num1, denom1)
+            frac2 = Fraction(num2, denom2)
+            
+            if frac1 > frac2:
+                answer = ">"
+            elif frac1 < frac2:
+                answer = "<"
+            else:
+                answer = "="
+            
+            tasks.append({
+                'type': 'compare_diff_denom',
+                'numerator1': num1,
+                'denominator1': denom1,
+                'numerator2': num2,
+                'denominator2': denom2,
+                'answer': answer
+            })
+
+        # 1 задание повышенной сложности (обязательно для 7)
+        # Сокращение дроби с большими числами И сравнение
+        gcd_large = random.choice([6, 8, 9, 12, 15])
+        num_base = random.randint(3, 10)
+        denom_base = random.randint(num_base + 2, 15)
+        
+        numerator_large = num_base * gcd_large
+        denominator_large = denom_base * gcd_large
+        
+        tasks.append({
+            'type': 'reduce_hard',
+            'numerator': numerator_large,
+            'denominator': denominator_large,
+            'answer': f"{num_base}/{denom_base}",
+            'difficulty': 'hard',
+            'points': 2  # Это задание даёт 2 балла вместо 1
+        })
+        
+        return tasks
 
     def check_answers(self, submitted_answers):
         """Проверка ответов и выставление оценки"""
         tasks = json.loads(self.tasks_data)
         correct = 0
-
+        total_points = 0
+        earned_points = 0
+        
         for i, task in enumerate(tasks):
             user_answer = submitted_answers.get(str(i), '').strip()
             correct_answer = task['answer'].strip()
-
-            if user_answer.lower() == correct_answer.lower():
+            
+            # Получаем количество баллов за задание
+            task_points = task.get('points', 1)
+            total_points += task_points
+            
+            # Проверка ответа
+            is_correct = False
+            
+            if task.get('type') in ['compare_same_denom', 'compare_diff_denom']:
+                # Для сравнений нормализуем ответ
+                user_answer_normalized = user_answer.replace(' ', '')
+                correct_answer_normalized = correct_answer.replace(' ', '')
+                is_correct = user_answer_normalized == correct_answer_normalized
+            else:
+                # Для дробей проверяем точное совпадение или эквивалентность
+                is_correct = user_answer.lower() == correct_answer.lower()
+            
+            if is_correct:
                 correct += 1
-
+                earned_points += task_points
+        
         self.correct_count = correct
         self.answers = json.dumps(submitted_answers, ensure_ascii=False)
         self.submitted_at = timezone.now()
 
-        # Выставление оценки по 7-бальной системе
-        percentage = (correct / len(tasks)) * 100
+        # Выставление оценки по 7-бальной системе (на основе набранных баллов)
+        percentage = (earned_points / total_points) * 100 if total_points > 0 else 0
+        
         if percentage >= 95:
             self.score = 7
         elif percentage >= 85:

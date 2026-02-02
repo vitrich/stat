@@ -1,185 +1,174 @@
 {% extends 'base.html' %}
 
 {% block page_title %}Главная страница{% endblock %}
-
-{% block page_description %}Добро пожаловать в Math Letovo Junior{% endblock %}
+{% block page_description %}{% if user.is_authenticated %}Добро пожаловать, {{ user.student.full_name }}!{% else %}Система обучения математике{% endif %}{% endblock %}
 
 {% block content %}
-<style>
-    .lessons-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
 
-    .lesson-card {
-        background: white;
-        border: 1px solid var(--color-border);
-        border-radius: 12px;
-        padding: 1.5rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
-
-    .lesson-card:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        transform: translateY(-4px);
-        border-color: var(--color-primary);
-    }
-
-    .lesson-date {
-        display: inline-block;
-        background: var(--color-primary);
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-
-    .lesson-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--color-text);
-        margin-bottom: 0.75rem;
-    }
-
-    .lesson-meta {
-        display: flex;
-        gap: 1rem;
-        font-size: 0.875rem;
-        color: var(--color-text-light);
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--color-border);
-    }
-
-    .lesson-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.375rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-
-    .lesson-status.completed {
-        background: #d1fae5;
-        color: #065f46;
-    }
-
-    .lesson-status.available {
-        background: #dbeafe;
-        color: #1e3a8a;
-    }
-
-    .welcome-section {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border: 1px solid var(--color-border);
-    }
-
-    .welcome-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--color-primary);
-        margin-bottom: 1rem;
-    }
-
-    .welcome-text {
-        color: var(--color-text-light);
-        line-height: 1.6;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--color-text);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .no-lessons {
-        background: white;
-        border-radius: 12px;
-        padding: 3rem;
-        text-align: center;
-        color: var(--color-text-light);
-    }
-</style>
-
-{% if user.is_authenticated %}
-    <div class="welcome-section">
-        <h2 class="welcome-title">👋 Привет, {{ user.student.full_name }}!</h2>
-        <p class="welcome-text">
-            Добро пожаловать на платформу Math Letovo Junior. Здесь ты найдешь все свои уроки, задания и сможешь отслеживать свой прогресс.
+{% if user.is_authenticated and student %}
+<!-- Инструкция для детей -->
+<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+    <h2 style="color: white; font-size: 28px; margin-bottom: 20px;">📚 Как работает система</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;">
+        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px);">
+            <div style="font-size: 32px; margin-bottom: 10px;">1️⃣</div>
+            <h3 style="color: white; margin-bottom: 8px;">Выберите урок</h3>
+            <p style="opacity: 0.9; font-size: 14px;">Нажмите на урок из списка ниже, чтобы начать</p>
+        </div>
+        
+        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px);">
+            <div style="font-size: 32px; margin-bottom: 10px;">2️⃣</div>
+            <h3 style="color: white; margin-bottom: 8px;">Изучите теорию</h3>
+            <p style="opacity: 0.9; font-size: 14px;">Прочитайте материал урока внимательно</p>
+        </div>
+        
+        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px);">
+            <div style="font-size: 32px; margin-bottom: 10px;">3️⃣</div>
+            <h3 style="color: white; margin-bottom: 8px;">Пройдите тест</h3>
+            <p style="opacity: 0.9; font-size: 14px;">Ответьте на вопросы и получите оценку</p>
+        </div>
+        
+        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px);">
+            <div style="font-size: 32px; margin-bottom: 10px;">4️⃣</div>
+            <h3 style="color: white; margin-bottom: 8px;">Смотрите результат</h3>
+            <p style="opacity: 0.9; font-size: 14px;">Ваша оценка сохранится в системе</p>
+        </div>
+    </div>
+    
+    <div style="margin-top: 24px; padding: 16px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; border-left: 4px solid #FFD700;">
+        <p style="font-size: 16px; margin: 0;">
+            <strong>💡 Важно:</strong> Последнее задание в тесте повышенной сложности. Оно обязательно для получения оценки 7!
         </p>
     </div>
+</div>
 
-    <h2 class="section-title">📚 Доступные уроки</h2>
-
+<!-- Список доступных уроков -->
+<div class="card">
+    <h2>📖 Доступные уроки</h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 24px;">Нажмите на урок, чтобы начать изучение</p>
+    
     {% if lessons %}
-    <div class="lessons-grid">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
         {% for lesson in lessons %}
-        <a href="{% url 'lesson_view' lesson_date=lesson.date %}" class="lesson-card">
-            <div class="lesson-date">{{ lesson.date|date:"d.m.Y" }}</div>
-            <h3 class="lesson-title">{{ lesson.title }}</h3>
-
-            {% if lesson.completed %}
-            <div class="lesson-status completed">
-                ✅ Выполнено
-            </div>
-            {% else %}
-            <div class="lesson-status available">
-                📝 Доступен
-            </div>
-            {% endif %}
-
-            <div class="lesson-meta">
-                <span>⏱️ {{ lesson.test_duration_minutes }} мин</span>
-                <span>📊 7 заданий</span>
+        <a href="{% url 'lesson_view' lesson.date %}" style="text-decoration: none; color: inherit;">
+            <div style="padding: 20px; border: 2px solid {% if lesson.completed %}#4CAF50{% else %}var(--color-border){% endif %}; border-radius: 12px; transition: all 0.3s ease; background: {% if lesson.completed %}rgba(76, 175, 80, 0.05){% else %}white{% endif %}; cursor: pointer;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <span style="font-size: 32px;">{% if lesson.completed %}✅{% else %}📝{% endif %}</span>
+                            <h3 style="color: var(--color-accent-primary); margin: 0; font-size: 20px;">{{ lesson.title }}</h3>
+                        </div>
+                        
+                        <div style="display: flex; gap: 16px; color: var(--color-text-muted); font-size: 14px; margin-bottom: 8px;">
+                            <span>📅 {{ lesson.date|date:"d.m.Y" }}</span>
+                            <span>⏱️ {{ lesson.duration_minutes }} мин</span>
+                            <span>📝 Тест: {{ lesson.test_duration_minutes }} мин</span>
+                        </div>
+                        
+                        {% if lesson.completed and lesson.score %}
+                        <div style="display: inline-block; padding: 4px 12px; background: {% if lesson.score >= 6 %}#4CAF50{% elif lesson.score >= 4 %}#FFA726{% else %}#EF5350{% endif %}; color: white; border-radius: 6px; font-weight: 600; font-size: 14px; margin-top: 8px;">
+                            Оценка: {{ lesson.score }}/7
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="text-align: center; padding: 16px; background: {% if lesson.completed %}#4CAF50{% else %}var(--color-orange){% endif %}; color: white; border-radius: 12px; min-width: 120px;">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">
+                            {% if lesson.completed %}Пройдено{% else %}Доступно{% endif %}
+                        </div>
+                        <div style="font-size: 18px; font-weight: 600;">
+                            {% if lesson.completed %}
+                                Результаты →
+                            {% else %}
+                                Начать →
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </a>
         {% endfor %}
     </div>
     {% else %}
-    <div class="no-lessons">
-        <h3 style="margin-bottom: 1rem; color: var(--color-text);">📭 Уроков пока нет</h3>
-        <p>Новые уроки появятся здесь, как только преподаватель их добавит.</p>
+    <div style="text-align: center; padding: 40px; color: var(--color-text-muted);">
+        <p style="font-size: 18px;">📚 Пока нет доступных уроков</p>
+        <p style="font-size: 14px; margin-top: 8px;">Уроки появятся здесь, когда преподаватель их создаст</p>
     </div>
     {% endif %}
+</div>
+
+<!-- Ваш прогресс -->
+{% if lessons %}
+<div class="card">
+    <h2>📊 Ваш прогресс</h2>
+    <div style="margin-top: 16px;">
+        {% with total=lessons|length completed=lessons|selectattr:"completed"|list|length %}
+        <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: 500;">Пройдено уроков:</span>
+                <span style="color: var(--color-accent-primary); font-weight: 600;">{{ completed }} из {{ total }}</span>
+            </div>
+            <div style="width: 100%; height: 24px; background: var(--color-bg-tertiary); border-radius: 12px; overflow: hidden;">
+                <div style="width: {% widthratio completed total 100 %}%; height: 100%; background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%); transition: width 0.5s ease;"></div>
+            </div>
+        </div>
+        
+        {% if completed > 0 %}
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px;">
+            <div style="text-align: center; padding: 16px; background: var(--color-bg-tertiary); border-radius: 8px;">
+                <div style="font-size: 32px; font-weight: 700; color: var(--color-accent-primary);">{{ completed }}</div>
+                <div style="font-size: 14px; color: var(--color-text-muted);">Пройдено</div>
+            </div>
+            <div style="text-align: center; padding: 16px; background: var(--color-bg-tertiary); border-radius: 8px;">
+                <div style="font-size: 32px; font-weight: 700; color: var(--color-orange);">{{ total|add:"-"|add:completed }}</div>
+                <div style="font-size: 14px; color: var(--color-text-muted);">Осталось</div>
+            </div>
+            <div style="text-align: center; padding: 16px; background: var(--color-bg-tertiary); border-radius: 8px;">
+                <div style="font-size: 32px; font-weight: 700; color: var(--color-success);">{% widthratio completed total 100 %}%</div>
+                <div style="font-size: 14px; color: var(--color-text-muted);">Прогресс</div>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+</div>
+{% endif %}
 
 {% else %}
-    <div class="welcome-section">
-        <h2 class="welcome-title">📐 Math Letovo Junior</h2>
-        <p class="welcome-text">
-            Образовательная платформа для управления учебным процессом.
-        </p>
-        <div style="margin-top: 1.5rem;">
-            <a href="{% url 'login' %}" class="btn btn-primary" style="margin-right: 1rem;">Войти</a>
-            <a href="{% url 'register' %}" class="btn btn-outline">Регистрация</a>
-        </div>
+<!-- Гостевая страница (если не авторизован) -->
+<div class="card" style="text-align: center; padding: 60px 40px;">
+    <h2 style="font-size: 36px; color: var(--color-accent-primary); margin-bottom: 16px;">📐 Добро пожаловать!</h2>
+    <p style="font-size: 18px; color: var(--color-text-secondary); margin-bottom: 32px;">
+        Система обучения математике для учеников 5 класса Летово
+    </p>
+    
+    <div style="display: flex; gap: 16px; justify-content: center;">
+        <a href="{% url 'login' %}" style="padding: 14px 32px; background: var(--color-accent-primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease;">
+            🔑 Войти
+        </a>
+        <a href="{% url 'register' %}" style="padding: 14px 32px; background: var(--color-orange); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease;">
+            ✨ Зарегистрироваться
+        </a>
     </div>
+</div>
 
-    <div class="card">
-        <h2>Возможности</h2>
-        <ul style="line-height: 2; color: var(--color-text-light);">
-            <li>✨ Интерактивные уроки математики</li>
-            <li>📝 Система задач и тестирования</li>
-            <li>👥 Работа в дифференцированных группах</li>
-            <li>📊 Отслеживание прогресса</li>
-        </ul>
-    </div>
+<div class="card">
+    <h3 style="color: var(--color-accent-primary); margin-bottom: 16px;">✨ Возможности системы</h3>
+    <ul style="list-style: none; padding: 0;">
+        <li style="padding: 12px 0; border-bottom: 1px solid var(--color-border);">📖 Интерактивные уроки математики</li>
+        <li style="padding: 12px 0; border-bottom: 1px solid var(--color-border);">📝 Автоматическая проверка заданий</li>
+        <li style="padding: 12px 0; border-bottom: 1px solid var(--color-border);">📊 Отслеживание прогресса</li>
+        <li style="padding: 12px 0;">🎯 Персональные задания для каждого ученика</li>
+    </ul>
+</div>
 {% endif %}
+
+<style>
+    a:hover > div {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+</style>
 
 {% endblock %}

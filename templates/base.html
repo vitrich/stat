@@ -4,35 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Math Letovo Junior{% endblock %}</title>
-
     <style>
         :root {
             --color-bg-primary: #FFFFFF;
             --color-bg-secondary: #F5F7FA;
             --color-bg-tertiary: #E8EEF5;
-
             --color-accent-primary: #1976D2;
             --color-accent-hover: #1565C0;
             --color-accent-light: #42A5F5;
             --color-orange: #FF6B35;
             --color-orange-hover: #FF5722;
             --color-blue-light: #E3F2FD;
-
             --color-text-primary: #1A1A1A;
             --color-text-secondary: #4A4A4A;
             --color-text-muted: #757575;
-
             --color-border: #E0E0E0;
             --color-success: #4CAF50;
             --color-warning: #FFA726;
             --color-danger: #EF5350;
-
-            /* Для совместимости */
-            --color-primary: #1976D2;
-            --color-primary-dark: #1565C0;
-            --color-text: #1A1A1A;
-            --color-text-light: #757575;
-
             --sidebar-width: 240px;
             --topbar-height: 64px;
         }
@@ -50,7 +39,6 @@
             line-height: 1.6;
         }
 
-        /* Topbar */
         .topbar {
             position: fixed;
             top: 0;
@@ -102,6 +90,33 @@
             color: white;
         }
 
+        /* НОВОЕ: Отображение имени пользователя */
+        .topbar__user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: var(--color-blue-light);
+            border-radius: 8px;
+            margin-right: 12px;
+            color: var(--color-text-primary);
+            font-size: 14px;
+        }
+
+        .topbar__user-info strong {
+            color: var(--color-accent-primary);
+            font-weight: 600;
+        }
+
+        .topbar__user-info .class-badge {
+            background: var(--color-orange);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         .topbar__auth {
             display: flex;
             gap: 12px;
@@ -136,7 +151,6 @@
             background: rgba(239, 83, 80, 0.2);
         }
 
-        /* Sidebar */
         .sidebar {
             position: fixed;
             top: var(--topbar-height);
@@ -204,7 +218,6 @@
             text-align: center;
         }
 
-        /* Main Content */
         .main-content {
             margin-top: var(--topbar-height);
             margin-left: var(--sidebar-width);
@@ -212,39 +225,26 @@
             min-height: calc(100vh - var(--topbar-height));
         }
 
-        /* Messages */
-        .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid;
+        .content-header {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
         }
 
-        .alert-success {
-            background-color: #d1fae5;
-            color: #065f46;
-            border-color: #6ee7b7;
+        .content-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--color-accent-primary);
+            margin-bottom: 8px;
         }
 
-        .alert-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border-color: #fca5a5;
+        .content-header p {
+            color: var(--color-text-muted);
+            font-size: 16px;
         }
 
-        .alert-warning {
-            background-color: #fef3c7;
-            color: #92400e;
-            border-color: #fcd34d;
-        }
-
-        .alert-info {
-            background-color: #dbeafe;
-            color: #1e3a8a;
-            border-color: #93c5fd;
-        }
-
-        /* Card */
         .card {
             background: #FFFFFF;
             border: 1px solid var(--color-border);
@@ -266,7 +266,6 @@
             font-size: 20px;
         }
 
-        /* Mobile */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -289,61 +288,78 @@
             .topbar__nav {
                 display: none;
             }
+
+            .topbar__user-info {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
         }
     </style>
-
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Topbar -->
+    <!-- Топбар -->
     <header class="topbar">
         <div class="topbar__logo">📐 Math Letovo Junior</div>
-
+        
         <nav class="topbar__nav">
-            <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">Новости</a>
-            <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">Задачи</a>
-            <a href="{% url 'students' %}" class="topbar__link {% if request.path == '/students/' %}active{% endif %}">Ученики</a>
-            <a href="{% url 'statistics' %}" class="topbar__link {% if request.path == '/statistics/' %}active{% endif %}">Статистика</a>
+            <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">📰 Новости</a>
+            <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">📝 Задачи</a>
+            <a href="{% url 'students' %}" class="topbar__link {% if request.path == '/students/' %}active{% endif %}">👥 Ученики</a>
+            <a href="{% url 'statistics' %}" class="topbar__link {% if request.path == '/statistics/' %}active{% endif %}">📊 Статистика</a>
         </nav>
 
         <div class="topbar__auth">
             {% if user.is_authenticated %}
+                <!-- НОВОЕ: Отображение ФИО и класса -->
+                {% if user.student %}
+                <div class="topbar__user-info">
+                    <span>👤 <strong>{{ user.student.full_name }}</strong></span>
+                    {% if user.student.class_name %}
+                    <span class="class-badge">{{ user.student.class_name }}</span>
+                    {% endif %}
+                </div>
+                {% elif user.teacher_profile %}
+                <div class="topbar__user-info">
+                    <span>👨‍🏫 <strong>{{ user.teacher_profile.full_name }}</strong></span>
+                </div>
+                {% endif %}
+
                 <form method="post" action="{% url 'logout' %}" style="margin: 0;">
                     {% csrf_token %}
-                    <button type="submit" class="topbar__link topbar__link--logout">Выйти</button>
+                    <button type="submit" class="topbar__link topbar__link--logout">🚪 Выход</button>
                 </form>
             {% else %}
-                <a href="{% url 'login' %}" class="topbar__link topbar__link--login">Вход</a>
-                <a href="{% url 'register' %}" class="topbar__link topbar__link--register">Регистрация</a>
+                <a href="{% url 'login' %}" class="topbar__link topbar__link--login">🔑 Вход</a>
+                <a href="{% url 'register' %}" class="topbar__link topbar__link--register">✨ Регистрация</a>
             {% endif %}
         </div>
     </header>
 
-    <!-- Sidebar -->
-    {% if user.is_authenticated %}
+    <!-- Сайдбар -->
     <aside class="sidebar">
         <div class="sidebar__section">
-            <div class="sidebar__title">Новости</div>
+            <div class="sidebar__title">📰 Новости</div>
             <ul class="sidebar__menu">
                 <li class="sidebar__item">
                     <a href="{% url 'news' %}" class="sidebar__link {% if request.path == '/news/' %}active{% endif %}">
-                        <span class="sidebar__icon">📋</span> Все новости
+                        <span class="sidebar__icon">📢</span> Актуальные
                     </a>
                 </li>
                 <li class="sidebar__item">
                     <a href="{% url 'news_archive' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📦</span> Архив
+                        <span class="sidebar__icon">📚</span> Архив
                     </a>
                 </li>
             </ul>
         </div>
 
         <div class="sidebar__section">
-            <div class="sidebar__title">Задачи</div>
+            <div class="sidebar__title">📝 Задачи</div>
             <ul class="sidebar__menu">
                 <li class="sidebar__item">
                     <a href="{% url 'tasks_active' %}" class="sidebar__link">
-                        <span class="sidebar__icon">⏳</span> Активные
+                        <span class="sidebar__icon">🔥</span> Активные
                     </a>
                 </li>
                 <li class="sidebar__item">
@@ -353,23 +369,23 @@
                 </li>
                 <li class="sidebar__item">
                     <a href="{% url 'tasks_create' %}" class="sidebar__link">
-                        <span class="sidebar__icon">➕</span> Создать задачу
+                        <span class="sidebar__icon">➕</span> Создать
                     </a>
                 </li>
             </ul>
         </div>
 
         <div class="sidebar__section">
-            <div class="sidebar__title">Ученики</div>
+            <div class="sidebar__title">👥 Ученики</div>
             <ul class="sidebar__menu">
                 <li class="sidebar__item">
                     <a href="{% url 'students_list' %}" class="sidebar__link">
-                        <span class="sidebar__icon">👥</span> Список учеников
+                        <span class="sidebar__icon">📋</span> Список
                     </a>
                 </li>
                 <li class="sidebar__item">
                     <a href="{% url 'students_groups' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📊</span> По группам
+                        <span class="sidebar__icon">👥</span> Группы
                     </a>
                 </li>
                 <li class="sidebar__item">
@@ -381,16 +397,16 @@
         </div>
 
         <div class="sidebar__section">
-            <div class="sidebar__title">Статистика</div>
+            <div class="sidebar__title">📊 Статистика</div>
             <ul class="sidebar__menu">
                 <li class="sidebar__item">
                     <a href="{% url 'statistics' %}" class="sidebar__link {% if request.path == '/statistics/' %}active{% endif %}">
-                        <span class="sidebar__icon">📊</span> Переходы групп
+                        <span class="sidebar__icon">📊</span> Переходы
                     </a>
                 </li>
                 <li class="sidebar__item">
                     <a href="{% url 'stats_overview' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📋</span> Обзор
+                        <span class="sidebar__icon">📈</span> Обзор
                     </a>
                 </li>
                 <li class="sidebar__item">
@@ -401,27 +417,22 @@
             </ul>
         </div>
     </aside>
-    {% endif %}
 
-    <!-- Main Content -->
+    <!-- Основной контент -->
     <main class="main-content">
-        <!-- Messages -->
         {% if messages %}
-        <div class="messages">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
+                <div class="card" style="background: {% if message.tags == 'success' %}#E8F5E9{% elif message.tags == 'error' %}#FFEBEE{% elif message.tags == 'warning' %}#FFF3E0{% else %}#E3F2FD{% endif %}; border-left: 4px solid {% if message.tags == 'success' %}#4CAF50{% elif message.tags == 'error' %}#EF5350{% elif message.tags == 'warning' %}#FFA726{% else %}#1976D2{% endif %};">
                     {{ message }}
                 </div>
             {% endfor %}
-        </div>
         {% endif %}
 
-        <!-- Page Title -->
-        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem;">
-            {% block page_title %}Добро пожаловать{% endblock %}
-        </h1>
+        <div class="content-header">
+            <h1>{% block page_title %}Добро пожаловать{% endblock %}</h1>
+            <p>{% block page_description %}Система управления математическими группами{% endblock %}</p>
+        </div>
 
-        <!-- Content -->
         {% block content %}
         {% endblock %}
     </main>
