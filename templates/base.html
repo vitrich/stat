@@ -39,7 +39,6 @@
             --color-success: #4CAF50;
             --color-warning: #FFA726;
             --color-danger: #EF5350;
-            --sidebar-width: 240px;
             --topbar-height: 64px;
         }
 
@@ -167,78 +166,13 @@
             background: rgba(239, 83, 80, 0.2);
         }
 
-        .sidebar {
-            position: fixed;
-            top: var(--topbar-height);
-            left: 0;
-            width: var(--sidebar-width);
-            height: calc(100vh - var(--topbar-height));
-            background: #FFFFFF;
-            border-right: 1px solid var(--color-border);
-            padding: 24px 0;
-            overflow-y: auto;
-            z-index: 100;
-        }
-
-        .sidebar__section {
-            margin-bottom: 32px;
-        }
-
-        .sidebar__title {
-            padding: 0 20px 12px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--color-text-muted);
-            font-weight: 600;
-        }
-
-        .sidebar__menu {
-            list-style: none;
-        }
-
-        .sidebar__item {
-            margin: 4px 12px;
-        }
-
-        .sidebar__link {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            color: var(--color-text-secondary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 500;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar__link:hover {
-            background: var(--color-blue-light);
-            color: var(--color-accent-primary);
-            transform: translateX(4px);
-            border-left-color: var(--color-accent-light);
-        }
-
-        .sidebar__link.active {
-            background: var(--color-blue-light);
-            color: var(--color-accent-primary);
-            border-left-color: var(--color-orange);
-        }
-
-        .sidebar__icon {
-            margin-right: 12px;
-            font-size: 18px;
-            min-width: 20px;
-            text-align: center;
-        }
-
         .main-content {
             margin-top: var(--topbar-height);
-            margin-left: var(--sidebar-width);
             padding: 32px;
             min-height: calc(100vh - var(--topbar-height));
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .content-header {
@@ -283,19 +217,6 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
             .topbar__logo {
                 font-size: 18px;
                 margin-right: 16px;
@@ -308,6 +229,10 @@
             .topbar__user-info {
                 font-size: 12px;
                 padding: 6px 10px;
+            }
+
+            .main-content {
+                padding: 16px;
             }
         }
     </style>
@@ -350,88 +275,6 @@
             {% endif %}
         </div>
     </header>
-
-    <!-- Сайдбар -->
-    <aside class="sidebar">
-        <div class="sidebar__section">
-            <div class="sidebar__title">📰 Новости</div>
-            <ul class="sidebar__menu">
-                <li class="sidebar__item">
-                    <a href="{% url 'news' %}" class="sidebar__link {% if request.path == '/news/' %}active{% endif %}">
-                        <span class="sidebar__icon">📢</span> Актуальные
-                    </a>
-                </li>
-                <li class="sidebar__item">
-                    <a href="{% url 'news_archive' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📚</span> Архив
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="sidebar__section">
-            <div class="sidebar__title">📝 Задачи</div>
-            <ul class="sidebar__menu">
-                <li class="sidebar__item">
-                    <a href="{% url 'tasks_active' %}" class="sidebar__link">
-                        <span class="sidebar__icon">🔥</span> Активные
-                    </a>
-                </li>
-                <li class="sidebar__item">
-                    <a href="{% url 'tasks_completed' %}" class="sidebar__link">
-                        <span class="sidebar__icon">✅</span> Выполненные
-                    </a>
-                </li>
-                <li class="sidebar__item">
-                    <a href="{% url 'tasks_create' %}" class="sidebar__link">
-                        <span class="sidebar__icon">➕</span> Создать
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="sidebar__section">
-            <div class="sidebar__title">👥 Ученики</div>
-            <ul class="sidebar__menu">
-                <li class="sidebar__item">
-                    <a href="{% url 'students_list' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📋</span> Список
-                    </a>
-                </li>
-                <li class="sidebar__item">
-                    <a href="{% url 'students_groups' %}" class="sidebar__link">
-                        <span class="sidebar__icon">👥</span> Группы
-                    </a>
-                </li>
-                <li class="sidebar__item">
-                    <a href="{% url 'students_progress' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📈</span> Прогресс
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="sidebar__section">
-            <div class="sidebar__title">📊 Статистика</div>
-            <ul class="sidebar__menu">
-                <li class="sidebar__item">
-                    <a href="{% url 'statistics' %}" class="sidebar__link {% if request.path == '/statistics/' %}active{% endif %}">
-                        <span class="sidebar__icon">📊</span> Переходы
-                    </a>
-                </li>
-                <li class="sidebar__item">
-                    <a href="{% url 'stats_overview' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📈</span> Обзор
-                    </a>
-                </li>
-                <li class="sidebar__item">
-                    <a href="{% url 'stats_reports' %}" class="sidebar__link">
-                        <span class="sidebar__icon">📄</span> Отчёты
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </aside>
 
     <!-- Основной контент -->
     <main class="main-content">
