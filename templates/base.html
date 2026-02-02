@@ -90,7 +90,6 @@
             color: white;
         }
 
-        /* НОВОЕ: Отображение имени пользователя */
         .topbar__user-info {
             display: flex;
             align-items: center;
@@ -301,7 +300,7 @@
     <!-- Топбар -->
     <header class="topbar">
         <div class="topbar__logo">📐 Math Letovo Junior</div>
-        
+
         <nav class="topbar__nav">
             <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">📰 Новости</a>
             <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">📝 Задачи</a>
@@ -311,7 +310,6 @@
 
         <div class="topbar__auth">
             {% if user.is_authenticated %}
-                <!-- НОВОЕ: Отображение ФИО и класса -->
                 {% if user.student %}
                 <div class="topbar__user-info">
                     <span>👤 <strong>{{ user.student.full_name }}</strong></span>
