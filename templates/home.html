@@ -103,34 +103,38 @@
 <div class="card">
     <h2>📊 Ваш прогресс</h2>
     <div style="margin-top: 16px;">
-        {% with total=lessons|length completed=lessons|selectattr:"completed"|list|length %}
+        {% if total_lessons > 0 %}
         <div style="margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span style="font-weight: 500;">Пройдено уроков:</span>
-                <span style="color: var(--color-accent-primary); font-weight: 600;">{{ completed }} из {{ total }}</span>
+                <span style="color: var(--color-accent-primary); font-weight: 600;">{{ completed_count }} из {{ total_lessons }}</span>
             </div>
             <div style="width: 100%; height: 24px; background: var(--color-bg-tertiary); border-radius: 12px; overflow: hidden;">
-                <div style="width: {% widthratio completed total 100 %}%; height: 100%; background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%); transition: width 0.5s ease;"></div>
+                {% if total_lessons > 0 %}
+                <div style="width: {% widthratio completed_count total_lessons 100 %}%; height: 100%; background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%); transition: width 0.5s ease;"></div>
+                {% endif %}
             </div>
         </div>
-        
-        {% if completed > 0 %}
+
+        {% if completed_count > 0 %}
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px;">
             <div style="text-align: center; padding: 16px; background: var(--color-bg-tertiary); border-radius: 8px;">
-                <div style="font-size: 32px; font-weight: 700; color: var(--color-accent-primary);">{{ completed }}</div>
+                <div style="font-size: 32px; font-weight: 700; color: var(--color-accent-primary);">{{ completed_count }}</div>
                 <div style="font-size: 14px; color: var(--color-text-muted);">Пройдено</div>
             </div>
             <div style="text-align: center; padding: 16px; background: var(--color-bg-tertiary); border-radius: 8px;">
-                <div style="font-size: 32px; font-weight: 700; color: var(--color-orange);">{{ total|add:"-"|add:completed }}</div>
+                {% with remaining=total_lessons|add:"-"|add:completed_count %}
+                <div style="font-size: 32px; font-weight: 700; color: var(--color-orange);">{{ remaining }}</div>
+                {% endwith %}
                 <div style="font-size: 14px; color: var(--color-text-muted);">Осталось</div>
             </div>
             <div style="text-align: center; padding: 16px; background: var(--color-bg-tertiary); border-radius: 8px;">
-                <div style="font-size: 32px; font-weight: 700; color: var(--color-success);">{% widthratio completed total 100 %}%</div>
+                <div style="font-size: 32px; font-weight: 700; color: var(--color-success);">{% widthratio completed_count total_lessons 100 %}%</div>
                 <div style="font-size: 14px; color: var(--color-text-muted);">Прогресс</div>
             </div>
         </div>
         {% endif %}
-        {% endwith %}
+        {% endif %}
     </div>
 </div>
 {% endif %}

@@ -12,35 +12,44 @@ from datetime import date
 
 def home(request):
     context = {}
-    
+
     # Если пользователь авторизован и является учеником
     if request.user.is_authenticated:
         try:
             student = request.user.student
-            
+
             # Получаем все активные уроки
             lessons = Lesson.objects.filter(is_active=True).order_by('date')
-            
+
             # Проверяем статус выполнения каждого урока
             lessons_with_status = []
+            completed_count = 0  # ДОБАВЛЕНО: счётчик пройденных уроков
+
             for lesson in lessons:
                 try:
                     lesson_task = LessonTask.objects.get(lesson=lesson, student=student)
                     lesson.completed = lesson_task.submitted_at is not None
                     lesson.score = lesson_task.score if lesson_task.submitted_at else None
+
+                    # ДОБАВЛЕНО: считаем пройденные уроки
+                    if lesson.completed:
+                        completed_count += 1
+
                 except LessonTask.DoesNotExist:
                     lesson.completed = False
                     lesson.score = None
-                
+
                 lessons_with_status.append(lesson)
-            
+
             context['lessons'] = lessons_with_status
             context['student'] = student
-            
+            context['completed_count'] = completed_count  # ДОБАВЛЕНО
+            context['total_lessons'] = len(lessons_with_status)  # ДОБАВЛЕНО
+
         except Student.DoesNotExist:
             # Пользователь не ученик (возможно, преподаватель)
             pass
-    
+
     return render(request, 'home.html', context)
 
 
