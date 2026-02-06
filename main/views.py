@@ -437,15 +437,10 @@ def register(request):
         if form.is_valid():
             user = form.save()
             student = form.cleaned_data['student']
-            
-            # АВТОМАТИЧЕСКИЙ ВХОД ПОСЛЕ РЕГИСТРАЦИИ
             login(request, user)
-            
-            messages.success(request, f'Регистрация успешна! Добро пожаловать, {student.full_name}!')
-            
-            # РЕДИРЕКТ НА ГЛАВНУЮ СТРАНИЦУ
+            messages.success(request, f"Регистрация успешна! Добро пожаловать, {student.full_name}!")
             return redirect('home')
     else:
         form = StudentRegistrationForm()
-    
     return render(request, 'register.html', {'form': form})
+

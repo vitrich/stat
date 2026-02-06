@@ -241,7 +241,7 @@
 <body>
     <!-- Топбар -->
     <header class="topbar">
-        <div class="topbar__logo">📐 Math Letovo Junior</div>
+        <a class="topbar__logo" href="{% url 'home' %}">Math Letovo Junior</a>
 
         <nav class="topbar__nav">
             <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">📰 Новости</a>
