@@ -42,7 +42,7 @@ class StudentRegistrationForm(forms.Form):
             last_name=student.full_name.split()[0] if len(student.full_name.split()) > 0 else ''
         )
 
-        # Связываем с учеником
+        # Связываем с учеником hi
         student.user = user
         student.save()
 
