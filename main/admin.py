@@ -1,73 +1,71 @@
 from django.contrib import admin
-from .models import Student, Group, Teacher, GroupHistory, Lesson, LessonTask
+from .models import (
+    Teacher, Group, Student, GroupHistory,
+    Lesson, LessonTask,
+    Assignment, Submission
+)
 
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'email']
-    search_fields = ['full_name', 'email']
+    list_display = ("fullname", "user", "email")
+    search_fields = ("fullname", "email", "user__username")
 
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ['number', 'teacher', 'get_student_count']
-    list_filter = ['teacher']
-    search_fields = ['number']
-
-    def get_student_count(self, obj):
-        return obj.students.count()
-
-    get_student_count.short_description = 'Количество учеников'
+    list_display = ("number", "teacher", "color")
+    list_filter = ("number",)
+    search_fields = ("number", "teacher__fullname")
+    ordering = ("number",)
 
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'class_name', 'current_group', 'user']
-    list_filter = ['current_group', 'class_name']
-    search_fields = ['full_name', 'user__username']
-    ordering = ['full_name']
+    list_display = ("fullname", "classname", "currentgroup", "user")
+    list_filter = ("currentgroup", "classname")
+    search_fields = ("fullname", "classname", "user__username")
+    ordering = ("fullname",)
 
 
 @admin.register(GroupHistory)
 class GroupHistoryAdmin(admin.ModelAdmin):
-    list_display = ['student', 'group', 'transfer_date', 'reason']
-    list_filter = ['group', 'transfer_date']
-    search_fields = ['student__full_name', 'reason']
-    date_hierarchy = 'transfer_date'
-    ordering = ['-transfer_date']
+    list_display = ("student", "group", "transferdate", "reason")
+    list_filter = ("group", "transferdate")
+    date_hierarchy = "transferdate"
+    search_fields = ("student__fullname", "group__number")
+    ordering = ("-transferdate",)
 
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ['title', 'date', 'subject', 'grade', 'is_active', 'get_tasks_count']
-    list_filter = ['subject', 'grade', 'is_active', 'date']
-    search_fields = ['title', 'subject']
-    date_hierarchy = 'date'
-    ordering = ['-date']
-
-    def get_tasks_count(self, obj):
-        return obj.tasks.count()
-
-    get_tasks_count.short_description = 'Заданий создано'
+    list_display = ("title", "date", "grade", "subject", "isactive")
+    list_filter = ("grade", "subject", "isactive")
+    search_fields = ("title",)
+    ordering = ("-date",)
 
 
 @admin.register(LessonTask)
 class LessonTaskAdmin(admin.ModelAdmin):
-    list_display = ['student', 'lesson', 'score', 'correct_count', 'total_count', 'submitted_at']
-    list_filter = ['lesson', 'score', 'submitted_at']
-    search_fields = ['student__full_name', 'lesson__title']
-    readonly_fields = ['tasks_data', 'answers', 'submitted_at']
-    ordering = ['-submitted_at']
+    list_display = ("lesson", "student", "score", "correctcount", "totalcount", "submittedat")
+    list_filter = ("lesson", "submittedat")
+    search_fields = ("student__fullname", "lesson__title")
+    ordering = ("-submittedat",)
 
-    fieldsets = (
-        ('Основная информация', {
-            'fields': ('lesson', 'student')
-        }),
-        ('Задания и ответы', {
-            'fields': ('tasks_data', 'answers'),
-            'classes': ('collapse',)
-        }),
-        ('Результаты', {
-            'fields': ('score', 'correct_count', 'total_count', 'submitted_at')
-        }),
-    )
+    readonly_fields = ("tasksdata", "answers", "submittedat")
+
+
+@admin.register(Assignment)
+class AssignmentAdmin(admin.ModelAdmin):
+    list_display = ("title", "group", "teacher", "deadline", "createdat")
+    list_filter = ("group", "teacher")
+    search_fields = ("title", "group__number", "teacher__fullname")
+    ordering = ("-createdat",)
+
+
+@admin.register(Submission)
+class SubmissionAdmin(admin.ModelAdmin):
+    list_display = ("assignment", "student", "submittedat", "grade")
+    list_filter = ("grade", "submittedat")
+    search_fields = ("assignment__title", "student__fullname")
+    ordering = ("-submittedat",)
