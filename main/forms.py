@@ -5,7 +5,7 @@ from .models import Student
 
 class StudentRegistrationForm(forms.Form):
     student = forms.ModelChoiceField(
-        queryset=Student.objects.filter(user__isnull=True).order_by('full_name'),
+        queryset=Student.objects.filter(user__isnull=True).order_by('fullname'),
         label='Выберите ученика',
         empty_label='--- Выберите ---'
     )
