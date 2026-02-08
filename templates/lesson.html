@@ -1,126 +1,206 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block page_title %}{{ lesson.title }}{% endblock %}
-{% block page_description %}Изучите теорию и пройдите тест{% endblock %}
+{% block pagetitle %}{{ lesson.title }}{% endblock %}
+{% block pagedescription %}{% endblock %}
 
 {% block content %}
-
 <div class="card">
     <h2>{{ lesson.title }}</h2>
     <div style="color: var(--color-text-muted); margin-bottom: 24px;">
-        📅 {{ lesson.date|date:"d.m.Y" }} | ⏱️ {{ lesson.duration_minutes }} мин
+        {{ lesson.date|date:"d.m.Y" }} • {{ lesson.durationminutes }} мин
     </div>
-    
-    <!-- Теоретический материал -->
+
+    <!-- Теория -->
     <div style="padding: 24px; background: var(--color-bg-tertiary); border-radius: 12px; margin-bottom: 32px;">
-        {{ lesson.theory_content|safe }}
+        {{ lesson.theorycontent|safe }}
     </div>
 </div>
 
 <!-- Тест -->
 <div class="card">
-    <h2>📝 Тест по теме урока</h2>
-    <p style="color: var(--color-text-muted); margin-bottom: 8px;">Время на выполнение: {{ lesson.test_duration_minutes }} минут</p>
-    
-    {% if already_submitted %}
+    <h2>Тест</h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 8px;">
+        Время: {{ lesson.testdurationminutes }} минут
+    </p>
+
+    {% if alreadysubmitted %}
         <div style="padding: 24px; background: #E8F5E9; border: 2px solid #4CAF50; border-radius: 12px; text-align: center; margin-top: 24px;">
-            <p style="font-size: 20px; color: #2E7D32; margin-bottom: 16px;">✅ Тест уже сдан!</p>
-            <a href="{% url 'lesson_result' lesson.date %}" style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                Посмотреть результаты
+            <p style="font-size: 20px; color: #2E7D32; margin-bottom: 16px;">Тест уже отправлен!</p>
+            <a href="{% url 'lessonresult' lesson.date %}"
+               style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                Посмотреть результат
             </a>
         </div>
     {% else %}
         <form method="post" style="margin-top: 24px;">
             {% csrf_token %}
-            
+
             {% for task in tasks %}
-            <div style="padding: 24px; background: {% if task.difficulty == 'hard' %}#FFF3E0{% else %}#F5F7FA{% endif %}; border-radius: 12px; margin-bottom: 20px; border: 2px solid {% if task.difficulty == 'hard' %}#FF6B35{% else %}var(--color-border){% endif %};">
-                
-                {% if task.difficulty == 'hard' %}
-                <div style="background: #FF6B35; color: white; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-bottom: 12px; font-weight: 600; font-size: 14px;">
-                    ⭐ ПОВЫШЕННАЯ СЛОЖНОСТЬ (обязательно для 7)
+                <div style="padding: 24px; background: {% if task.difficulty == 'hard' %}#FFF3E0{% else %}#F5F7FA{% endif %};
+                            border-radius: 12px; margin-bottom: 20px;
+                            border: 2px solid {% if task.difficulty == 'hard' %}#FF6B35{% else %}var(--color-border){% endif %};">
+
+                    {% if task.difficulty == 'hard' %}
+                        <div style="background: #FF6B35; color: white; padding: 8px 16px; border-radius: 6px;
+                                    display: inline-block; margin-bottom: 12px; font-weight: 600; font-size: 14px;">
+                            ⭐ 7 уровень
+                        </div>
+                    {% endif %}
+
+                    <p style="font-weight: 600; color: var(--color-accent-primary); margin-bottom: 16px; font-size: 18px;">
+                        {{ forloop.counter }} / {{ tasks|length }}
+                    </p>
+
+                    {% if task.type == "classify" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Определи вид дроби:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator }}/{{ task.denominator }}
+                            </code>
+                        </p>
+                        <select name="answer_{{ forloop.counter0 }}" required
+                                style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px; background: white;">
+                            <option value="">Выбери...</option>
+                            <option value="proper">правильная</option>
+                            <option value="improper">неправильная</option>
+                        </select>
+
+                    {% elif task.type == "mixedtoimproper" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Преобразуй смешанное число в неправильную дробь:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.whole }} {{ task.numerator }}/{{ task.denominator }}
+                            </code>
+                        </p>
+                        <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">Ответ в формате m/n</p>
+                        <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="например: 15/4"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
+
+                    {% elif task.type == "impropertomixed" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Преобразуй неправильную дробь в смешанное число:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator }}/{{ task.denominator }}
+                            </code>
+                        </p>
+                        <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">Ответ в формате: a b/c</p>
+                        <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="например: 3 3/4"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
+
+                    {% elif task.type == "reduce" or task.type == "reducehard" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Сократи дробь:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator }}/{{ task.denominator }}
+                            </code>
+                        </p>
+                        <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">Ответ в формате m/n</p>
+                        <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="например: 2/3"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
+
+                    {% elif task.type == "comparesamedenom" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Сравни дроби:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator1 }}/{{ task.denominator1 }}
+                            </code>
+                            <span style="font-size: 20px; margin: 0 8px;">?</span>
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator2 }}/{{ task.denominator2 }}
+                            </code>
+                        </p>
+                        <select name="answer_{{ forloop.counter0 }}" required
+                                style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px; background: white;">
+                            <option value="">Выбери...</option>
+                            <option value=">">&gt;</option>
+                            <option value="<">&lt;</option>
+                            <option value="=">=</option>
+                        </select>
+
+                    {% elif task.type == "comparediffdenom" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Сравни дроби:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator1 }}/{{ task.denominator1 }}
+                            </code>
+                            <span style="font-size: 20px; margin: 0 8px;">?</span>
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator2 }}/{{ task.denominator2 }}
+                            </code>
+                        </p>
+                        <select name="answer_{{ forloop.counter0 }}" required
+                                style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px; background: white;">
+                            <option value="">Выбери...</option>
+                            <option value=">">&gt;</option>
+                            <option value="<">&lt;</option>
+                            <option value="=">=</option>
+                        </select>
+
+                    <!-- Урок 3: общий знаменатель + сложение/вычитание -->
+                    {% elif task.type == "common_denom" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Приведи к общему знаменателю <strong>{{ task.common_den }}</strong>:
+                        </p>
+                        <p style="font-size: 18px; margin-bottom: 12px;">
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator1 }}/{{ task.denominator1 }}
+                            </code>
+                            и
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator2 }}/{{ task.denominator2 }}
+                            </code>
+                        </p>
+                        <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">
+                            Ответ в формате: x/{{ task.common_den }}, y/{{ task.common_den }}
+                        </p>
+                        <input type="text" name="answer_{{ forloop.counter0 }}" required
+                               placeholder="например: 4/{{ task.common_den }}, 5/{{ task.common_den }}"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
+
+                    {% elif task.type == "add_diff" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Вычисли:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator1 }}/{{ task.denominator1 }}
+                            </code>
+                            +
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator2 }}/{{ task.denominator2 }}
+                            </code>
+                        </p>
+                        <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">
+                            Ответ: дробь m/n (можно не сокращать)
+                        </p>
+                        <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="например: 11/12"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
+
+                    {% elif task.type == "sub_diff" %}
+                        <p style="font-size: 16px; margin-bottom: 12px;">
+                            Вычисли:
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator1 }}/{{ task.denominator1 }}
+                            </code>
+                            −
+                            <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
+                                {{ task.numerator2 }}/{{ task.denominator2 }}
+                            </code>
+                        </p>
+                        <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">
+                            Ответ: дробь m/n (можно не сокращать)
+                        </p>
+                        <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="например: 7/12"
+                               style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
+
+                    {% endif %}
                 </div>
-                {% endif %}
-                
-                <p style="font-weight: 600; color: var(--color-accent-primary); margin-bottom: 16px; font-size: 18px;">
-                    Задание {{ forloop.counter }} из {{ tasks|length }}
-                </p>
-                
-                <!-- Задание на классификацию (урок 1) -->
-                {% if task.type == 'classify' %}
-                <p style="font-size: 16px; margin-bottom: 12px;">
-                    Определите, является ли дробь <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.numerator }}/{{ task.denominator }}</code> правильной или неправильной?
-                </p>
-                <select name="answer_{{ forloop.counter0 }}" required style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px; background: white;">
-                    <option value="">Выберите ответ...</option>
-                    <option value="proper">Правильная</option>
-                    <option value="improper">Неправильная</option>
-                </select>
-                
-                <!-- Смешанная → неправильная (урок 1) -->
-                {% elif task.type == 'mixed_to_improper' %}
-                <p style="font-size: 16px; margin-bottom: 12px;">
-                    Переведите смешанную дробь в неправильную:
-                    <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.whole }} {{ task.numerator }}/{{ task.denominator }}</code>
-                </p>
-                <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">Формат ответа: числитель/знаменатель (например, 15/4)</p>
-                <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="Введите ответ..." style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
-                
-                <!-- Неправильная → смешанная (урок 1) -->
-                {% elif task.type == 'improper_to_mixed' %}
-                <p style="font-size: 16px; margin-bottom: 12px;">
-                    Переведите неправильную дробь в смешанную:
-                    <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.numerator }}/{{ task.denominator }}</code>
-                </p>
-                <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">Формат ответа: целая часть пробел числитель/знаменатель (например, 3 3/4)</p>
-                <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="Введите ответ..." style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
-                
-                <!-- Сокращение дробей (урок 2) -->
-                {% elif task.type == 'reduce' or task.type == 'reduce_hard' %}
-                <p style="font-size: 16px; margin-bottom: 12px;">
-                    Сократите дробь:
-                    <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.numerator }}/{{ task.denominator }}</code>
-                </p>
-                <p style="font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px;">Формат ответа: числитель/знаменатель (например, 2/3)</p>
-                <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="Введите ответ..." style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
-                
-                <!-- Сравнение с одинаковым знаменателем (урок 2) -->
-                {% elif task.type == 'compare_same_denom' %}
-                <p style="font-size: 16px; margin-bottom: 12px;">
-                    Сравните дроби:
-                    <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.numerator1 }}/{{ task.denominator1 }}</code>
-                    <span style="font-size: 20px; margin: 0 8px;">___</span>
-                    <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.numerator2 }}/{{ task.denominator2 }}</code>
-                </p>
-                <select name="answer_{{ forloop.counter0 }}" required style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px; background: white;">
-                    <option value="">Выберите знак...</option>
-                    <option value=">">></option>
-                    <option value="<"><</option>
-                    <option value="=">=</option>
-                </select>
-                
-                <!-- Сравнение с разными знаменателями (урок 2) -->
-                {% elif task.type == 'compare_diff_denom' %}
-                <p style="font-size: 16px; margin-bottom: 12px;">
-                    Сравните дроби (приведите к общему знаменателю):
-                    <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.numerator1 }}/{{ task.denominator1 }}</code>
-                    <span style="font-size: 20px; margin: 0 8px;">___</span>
-                    <code style="font-size: 20px; background: white; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">{{ task.numerator2 }}/{{ task.denominator2 }}</code>
-                </p>
-                <select name="answer_{{ forloop.counter0 }}" required style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px; background: white;">
-                    <option value="">Выберите знак...</option>
-                    <option value=">">></option>
-                    <option value="<"><</option>
-                    <option value="=">=</option>
-                </select>
-                
-                {% endif %}
-            </div>
             {% endfor %}
-            
+
             <div style="margin-top: 32px; text-align: center;">
-                <button type="submit" style="padding: 16px 48px; background: var(--color-accent-primary); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);">
-                    ✅ Отправить на проверку
+                <button type="submit"
+                        style="padding: 16px 48px; background: var(--color-accent-primary); color: white; border: none;
+                               border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer;
+                               transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);">
+                    Отправить
                 </button>
             </div>
         </form>
@@ -128,25 +208,9 @@
 </div>
 
 <style>
-    code {
-        font-family: 'Courier New', monospace;
-    }
-    
-    button:hover {
-        background: var(--color-accent-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(25, 118, 210, 0.5);
-    }
-    
-    button:active {
-        transform: translateY(0);
-    }
-    
-    input:focus, select:focus {
-        outline: none;
-        border-color: var(--color-accent-primary);
-        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
-    }
+  code { font-family: "Courier New", monospace; }
+  button:hover { background: var(--color-accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(25, 118, 210, 0.5); }
+  button:active { transform: translateY(0); }
+  input:focus, select:focus { outline: none; border-color: var(--color-accent-primary); box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2); }
 </style>
-
 {% endblock %}

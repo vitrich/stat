@@ -3,38 +3,76 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib import messages
 from django.http import JsonResponse
+
 from .forms import StudentRegistrationForm
 from .models import GroupHistory, Student, Group, Lesson, LessonTask, Teacher
+
 from collections import defaultdict
 import json
 from datetime import date
+from fractions import Fraction
+
+
+def _normalize_fraction(s: str):
+    s = (s or "").strip().replace(" ", "")
+    if "/" not in s:
+        return None
+    try:
+        p, q = s.split("/", 1)
+        return Fraction(int(p), int(q))
+    except Exception:
+        return None
+
+
+def _is_correct_for_task(task: dict, useranswer: str, correctanswer: str) -> bool:
+    t = (task.get("type") or "").strip()
+    ua = (useranswer or "").strip()
+    ca = (correctanswer or "").strip()
+
+    # Урок 3: сложение/вычитание дробей — принимаем эквивалентные дроби
+    if t in ("add_diff", "sub_diff"):
+        f_ua = _normalize_fraction(ua)
+        f_ca = _normalize_fraction(ca)
+        return (f_ua is not None and f_ca is not None and f_ua == f_ca)
+
+    # Урок 3: привести к общему знаменателю — две дроби через запятую
+    if t == "common_denom":
+        parts_u = [p.strip() for p in (ua or "").split(",")]
+        parts_c = [p.strip() for p in (ca or "").split(",")]
+        if len(parts_u) != 2 or len(parts_c) != 2:
+            return False
+        u1 = _normalize_fraction(parts_u[0])
+        u2 = _normalize_fraction(parts_u[1])
+        c1 = _normalize_fraction(parts_c[0])
+        c2 = _normalize_fraction(parts_c[1])
+        return (u1 == c1 and u2 == c2)
+
+    # Урок 2: сравнение дробей — строгие символы > < = (без пробелов)
+    if t in ("comparesamedenom", "comparediffdenom"):
+        return ua.replace(" ", "") == ca.replace(" ", "")
+
+    # Остальное: как было — сравнение строк без учёта регистра
+    return ua.lower() == ca.lower()
 
 
 def home(request):
     context = {}
 
-    # Если пользователь авторизован и является учеником
     if request.user.is_authenticated:
         try:
             student = request.user.student
+            lessons = Lesson.objects.filter(isactive=True).order_by('date')
 
-            # Получаем все активные уроки
-            lessons = Lesson.objects.filter(is_active=True).order_by('date')
-
-            # Проверяем статус выполнения каждого урока
             lessons_with_status = []
-            completed_count = 0  # ДОБАВЛЕНО: счётчик пройденных уроков
+            completed_count = 0
 
             for lesson in lessons:
                 try:
-                    lesson_task = LessonTask.objects.get(lesson=lesson, student=student)
-                    lesson.completed = lesson_task.submitted_at is not None
-                    lesson.score = lesson_task.score if lesson_task.submitted_at else None
-
-                    # ДОБАВЛЕНО: считаем пройденные уроки
+                    lessontask = LessonTask.objects.get(lesson=lesson, student=student)
+                    lesson.completed = lessontask.submittedat is not None
+                    lesson.score = lessontask.score if lessontask.submittedat else None
                     if lesson.completed:
                         completed_count += 1
-
                 except LessonTask.DoesNotExist:
                     lesson.completed = False
                     lesson.score = None
@@ -43,394 +81,307 @@ def home(request):
 
             context['lessons'] = lessons_with_status
             context['student'] = student
-            context['completed_count'] = completed_count  # ДОБАВЛЕНО
-            context['total_lessons'] = len(lessons_with_status)  # ДОБАВЛЕНО
+            context['completedcount'] = completed_count
+            context['totallessons'] = len(lessons_with_status)
 
         except Student.DoesNotExist:
-            # Пользователь не ученик (возможно, преподаватель)
             pass
 
     return render(request, 'home.html', context)
 
 
-# Новости
 def news(request):
     return render(request, 'news.html')
 
 
-def news_archive(request):
+def newsarchive(request):
     return render(request, 'news.html', {'archive': True})
 
 
-# Уроки математики
 @login_required
-def lesson_view(request, lesson_date):
-    """Просмотр урока и выполнение заданий"""
+def lessonview(request, lessondate):
     try:
-        # Получаем урок по дате
-        lesson = get_object_or_404(Lesson, date=lesson_date, is_active=True)
-        
-        # Получаем ученика
+        lesson = get_object_or_404(Lesson, date=lessondate, isactive=True)
+
         try:
             student = request.user.student
         except Student.DoesNotExist:
-            messages.error(request, 'Ваш профиль ученика не найден.')
+            messages.error(request, 'Только ученики могут проходить уроки.')
             return redirect('home')
-        
-        # Получаем или создаем задание для ученика
-        lesson_task, created = LessonTask.objects.get_or_create(
-            lesson=lesson,
-            student=student
-        )
-        
-        # Если задание новое, генерируем задачи
-        if created or not lesson_task.tasks_data:
-            lesson_task.generate_tasks()
-        
-        # Загружаем задания
-        tasks = json.loads(lesson_task.tasks_data)
-        
-        # Обработка отправки формы
+
+        lessontask, created = LessonTask.objects.get_or_create(lesson=lesson, student=student)
+
+        if created or not lessontask.tasksdata:
+            lessontask.generate_tasks()
+
+        tasks = json.loads(lessontask.tasksdata)
+
         if request.method == 'POST':
-            if lesson_task.submitted_at:
-                messages.warning(request, 'Вы уже сдали этот тест!')
-                return redirect('lesson_result', lesson_date=lesson_date)
-            
-            # Собираем ответы
+            if lessontask.submittedat:
+                messages.warning(request, 'Тест уже был отправлен!')
+                return redirect('lessonresult', lessondate=lessondate)
+
             answers = {}
             for i in range(len(tasks)):
-                answer = request.POST.get(f'answer_{i}', '').strip()
+                answer = (request.POST.get(f'answer_{i}', '') or '').strip()
                 answers[str(i)] = answer
-            
-            # Проверяем и выставляем оценку
-            score = lesson_task.check_answers(answers)
-            messages.success(request, f'Тест сдан! Ваша оценка: {score} из 7')
-            return redirect('lesson_result', lesson_date=lesson_date)
-        
+
+            score = lessontask.check_answers(answers)
+            messages.success(request, f'Тест отправлен! Ваша оценка: {score} из 7')
+            return redirect('lessonresult', lessondate=lessondate)
+
         context = {
             'lesson': lesson,
-            'lesson_task': lesson_task,
+            'lessontask': lessontask,
             'tasks': tasks,
-            'already_submitted': lesson_task.submitted_at is not None
+            'alreadysubmitted': lessontask.submittedat is not None
         }
-        
         return render(request, 'lesson.html', context)
-    
+
     except Exception as e:
-        messages.error(request, f'Ошибка загрузки урока: {str(e)}')
+        messages.error(request, f'Ошибка: {str(e)}')
         return redirect('home')
 
 
 @login_required
-def lesson_result(request, lesson_date):
-    """Результаты выполнения урока"""
-    lesson = get_object_or_404(Lesson, date=lesson_date)
-    
+def lessonresult(request, lessondate):
+    lesson = get_object_or_404(Lesson, date=lessondate)
+
     try:
         student = request.user.student
     except Student.DoesNotExist:
-        messages.error(request, 'Ваш профиль ученика не найден.')
+        messages.error(request, 'Только ученики могут смотреть результаты урока.')
         return redirect('home')
-    
-    lesson_task = get_object_or_404(LessonTask, lesson=lesson, student=student)
-    
-    if not lesson_task.submitted_at:
-        messages.warning(request, 'Сначала выполните тест!')
-        return redirect('lesson_view', lesson_date=lesson_date)
-    
-    tasks = json.loads(lesson_task.tasks_data)
-    answers = json.loads(lesson_task.answers) if lesson_task.answers else {}
-    
-    # Формируем детальные результаты
+
+    lessontask = get_object_or_404(LessonTask, lesson=lesson, student=student)
+
+    if not lessontask.submittedat:
+        messages.warning(request, 'Сначала нужно пройти тест!')
+        return redirect('lessonview', lessondate=lessondate)
+
+    tasks = json.loads(lessontask.tasksdata)
+    answers = json.loads(lessontask.answers) if lessontask.answers else {}
+
     results = []
     for i, task in enumerate(tasks):
-        user_answer = answers.get(str(i), '')
-        correct_answer = task['answer']
-        is_correct = user_answer.strip().lower() == correct_answer.strip().lower()
-        
+        useranswer = (answers.get(str(i), "") or "").strip()
+        correctanswer = (task.get("answer", "") or "").strip()
+        iscorrect = _is_correct_for_task(task, useranswer, correctanswer)
+
         results.append({
             'task': task,
-            'user_answer': user_answer,
-            'correct_answer': correct_answer,
-            'is_correct': is_correct
+            'useranswer': useranswer,
+            'correctanswer': correctanswer,
+            'iscorrect': iscorrect
         })
-    
+
     context = {
         'lesson': lesson,
-        'lesson_task': lesson_task,
+        'lessontask': lessontask,
         'results': results
     }
-    
-    return render(request, 'lesson_result.html', context)
+    return render(request, 'lessonresult.html', context)
 
 
-# Задачи
 @login_required
 def tasks(request):
     return render(request, 'tasks.html')
 
 
 @login_required
-def tasks_active(request):
+def tasksactive(request):
     return render(request, 'tasks.html', {'filter': 'active'})
 
 
 @login_required
-def tasks_completed(request):
+def taskscompleted(request):
     return render(request, 'tasks.html', {'filter': 'completed'})
 
 
 @login_required
-def tasks_create(request):
+def taskscreate(request):
     return render(request, 'tasks.html', {'mode': 'create'})
 
 
-# Ученики
+def isteacher(user):
+    try:
+        return hasattr(user, 'teacherprofile')
+    except Exception:
+        return False
+
+
 @login_required
 def students(request):
-    """Главная страница раздела учеников - таблица результатов для учителей"""
-    # Проверка: является ли пользователь преподавателем
-    if not is_teacher(request.user):
-        messages.error(request, 'У вас нет доступа к этому разделу.')
+    if not isteacher(request.user):
+        messages.error(request, 'Доступ только для учителей.')
         return redirect('home')
-    
-    # Получаем преподавателя
-    teacher = request.user.teacher_profile
-    
-    # Получаем группы этого преподавателя
-    teacher_groups = teacher.groups.all()
-    
-    # Получаем всех учеников этих групп
-    students_list = Student.objects.filter(current_group__in=teacher_groups).order_by('full_name')
-    
-    # Получаем все уроки
-    lessons = Lesson.objects.filter(is_active=True).order_by('date')
-    
-    # Формируем таблицу результатов
-    results_table = []
-    for student in students_list:
-        student_data = {
-            'student': student,
-            'results': []
-        }
-        
+
+    teacher = request.user.teacherprofile
+    teachergroups = teacher.groups.all()
+
+    studentslist = Student.objects.filter(currentgroup__in=teachergroups).order_by('fullname')
+    lessons = Lesson.objects.filter(isactive=True).order_by('date')
+
+    resultstable = []
+    for student in studentslist:
+        studentdata = {'student': student, 'results': []}
         for lesson in lessons:
             try:
                 task = LessonTask.objects.get(lesson=lesson, student=student)
-                if task.submitted_at:
-                    student_data['results'].append({
-                        'lesson': lesson,
-                        'score': task.score,
-                        'submitted': True
-                    })
+                if task.submittedat:
+                    studentdata['results'].append({'lesson': lesson, 'score': task.score, 'submitted': True})
                 else:
-                    student_data['results'].append({
-                        'lesson': lesson,
-                        'score': None,
-                        'submitted': False
-                    })
+                    studentdata['results'].append({'lesson': lesson, 'score': None, 'submitted': False})
             except LessonTask.DoesNotExist:
-                student_data['results'].append({
-                    'lesson': lesson,
-                    'score': None,
-                    'submitted': False
-                })
-        
-        results_table.append(student_data)
-    
+                studentdata['results'].append({'lesson': lesson, 'score': None, 'submitted': False})
+        resultstable.append(studentdata)
+
     context = {
-        'results_table': results_table,
+        'resultstable': resultstable,
         'lessons': lessons,
-        'teacher_groups': teacher_groups
+        'teachergroups': teachergroups
     }
-    
     return render(request, 'students.html', context)
 
 
 @login_required
-def students_list(request):
+def studentslist(request):
     return render(request, 'students.html', {'view': 'list'})
 
 
 @login_required
-def students_groups(request):
+def studentsgroups(request):
     return render(request, 'students.html', {'view': 'groups'})
 
 
 @login_required
-def students_progress(request):
+def studentsprogress(request):
     return render(request, 'students.html', {'view': 'progress'})
 
 
-# Проверка: является ли пользователь преподавателем
-def is_teacher(user):
-    try:
-        return hasattr(user, 'teacher_profile')
-    except:
-        return False
-
-
-# Статистика - ТОЛЬКО ДЛЯ ПРЕПОДАВАТЕЛЕЙ
 @login_required
 def statistics(request):
-    """Статистика переходов между группами - интерактивный график (только для преподавателей)"""
-    
-    # Проверка прав доступа
-    if not is_teacher(request.user):
-        messages.error(request, 'У вас нет доступа к этому разделу. Статистика доступна только преподавателям.')
+    if not isteacher(request.user):
+        messages.error(request, 'Доступ только для учителей.')
         return redirect('home')
-    
-    # АВТОМАТИЧЕСКИ ОПРЕДЕЛЯЕМ ВСЕ УНИКАЛЬНЫЕ ДАТЫ ИЗ БД
-    key_dates = list(
+
+    keydates = list(
         GroupHistory.objects
-        .values_list('transfer_date', flat=True)
+        .values_list('transferdate', flat=True)
         .distinct()
-        .order_by('transfer_date')
+        .order_by('transferdate')
     )
-    
-    if not key_dates:
-        # Если истории нет, используем дефолтные даты
-        key_dates = [
+
+    if not keydates:
+        keydates = [
             date(2025, 9, 1),
             date(2025, 10, 15),
             date(2025, 12, 16),
-            date(2026, 1, 12)
+            date(2026, 1, 12),
         ]
-    
-    # Получаем всю историю
-    all_history = GroupHistory.objects.select_related('student', 'group').order_by('student_id', 'transfer_date')
-    
-    # Собираем историю для каждого ученика
-    students_history_raw = defaultdict(list)
-    students_info = {}
-    
-    for entry in all_history:
-        student_id = entry.student.id
-        students_history_raw[student_id].append({
-            'date': entry.transfer_date,
+
+    allhistory = GroupHistory.objects.select_related('student', 'group').order_by('student_id', 'transferdate')
+
+    studentshistoryraw = defaultdict(list)
+    studentsinfo = {}
+
+    for entry in allhistory:
+        studentid = entry.student.id
+        studentshistoryraw[studentid].append({
+            'date': entry.transferdate,
             'group': float(entry.group.number)
         })
-        
-        if student_id not in students_info:
-            students_info[student_id] = {
-                'id': student_id,
-                'name': entry.student.full_name
-            }
-    
-    # Дополняем историю промежуточными точками
-    students_full_history = {}
-    for student_id, history in students_history_raw.items():
-        # Сортируем по дате
-        history_sorted = sorted(history, key=lambda x: x['date'])
-        
-        # Собираем полную историю с промежуточными точками
-        full_history = []
-        
-        # Первая дата - когда ученик появился
-        first_date = history_sorted[0]['date']
-        first_group = history_sorted[0]['group']
-        
-        # Индекс текущей записи в истории
-        history_index = 0
-        current_group = first_group
-        
-        # Проходим по всем ключевым датам
-        for key_date in key_dates:
-            # Пропускаем даты до появления ученика
-            if key_date < first_date:
+        if studentid not in studentsinfo:
+            studentsinfo[studentid] = {'id': studentid, 'name': entry.student.fullname}
+
+    studentsfullhistory = {}
+    for studentid, history in studentshistoryraw.items():
+        historysorted = sorted(history, key=lambda x: x['date'])
+
+        if not historysorted:
+            continue
+
+        firstdate = historysorted[0]['date']
+        currentgroup = historysorted[0]['group']
+        historyindex = 0
+
+        fullhistory = []
+        for keydate in keydates:
+            if keydate < firstdate:
                 continue
-            
-            # Проверяем, есть ли изменение группы на эту дату
-            for i in range(history_index, len(history_sorted)):
-                if history_sorted[i]['date'] == key_date:
-                    current_group = history_sorted[i]['group']
-                    history_index = i + 1
+
+            for i in range(historyindex, len(historysorted)):
+                if historysorted[i]['date'] <= keydate:
+                    currentgroup = historysorted[i]['group']
+                    historyindex = i + 1
+                else:
                     break
-                elif history_sorted[i]['date'] > key_date:
-                    break
-            
-            # Добавляем точку на эту дату с текущей группой
-            full_history.append({
-                'date': key_date.strftime('%Y-%m-%d'),
-                'group': current_group
+
+            fullhistory.append({
+                'date': keydate.strftime("%Y-%m-%d"),
+                'group': currentgroup
             })
-        
-        students_full_history[student_id] = full_history
-    
-    # Собираем список учеников с историей
-    students_with_transitions = []
-    for student_id, history in students_full_history.items():
-        if len(history) > 0:
-            students_with_transitions.append({
-                'id': student_id,
-                'name': students_info[student_id]['name'],
+
+        studentsfullhistory[studentid] = fullhistory
+
+    studentswithtransitions = []
+    for studentid, history in studentsfullhistory.items():
+        if history:
+            studentswithtransitions.append({
+                'id': studentid,
+                'name': studentsinfo.get(studentid, {}).get('name', '—'),
                 'history': history
             })
-    
-    # Сортируем по имени
-    students_with_transitions.sort(key=lambda x: x['name'])
-    
-    # Статистика по группам
+
     groups = Group.objects.all().order_by('number')
-    group_stats = []
+    groupstats = []
     for group in groups:
-        current_count = Student.objects.filter(current_group=group).count()
-        group_stats.append({
+        currentcount = Student.objects.filter(currentgroup=group).count()
+        groupstats.append({
             'group': group,
-            'current_count': current_count,
-            'teacher': group.teacher.full_name if group.teacher else 'Не назначен'
+            'currentcount': currentcount,
+            'teacher': group.teacher.fullname if group.teacher else '—'
         })
-    
-    # Форматируем даты для отображения
-    dates_formatted = [d.strftime('%d.%m.%Y') for d in key_dates]
-    
+
+    datesformatted = [d.strftime("%d.%m.%Y") for d in keydates]
+
     context = {
-        'students_with_transitions': students_with_transitions,
-        'students_json': json.dumps({
-            s['id']: {
-                'name': s['name'],
-                'history': s['history']
-            } for s in students_with_transitions
-        }),
-        'group_stats': group_stats,
-        'key_dates': dates_formatted,
-        'dates_count': len(key_dates),
+        'studentswithtransitions': studentswithtransitions,
+        'studentsjson': json.dumps(
+            [{'id': s['id'], 'name': s['name'], 'history': s['history']} for s in studentswithtransitions],
+            ensure_ascii=False
+        ),
+        'groupstats': groupstats,
+        'keydates': datesformatted,
+        'datescount': len(keydates),
     }
-    
     return render(request, 'statistics.html', context)
 
 
 @login_required
-def stats_overview(request):
-    # Проверка прав доступа
-    if not is_teacher(request.user):
-        messages.error(request, 'У вас нет доступа к этому разделу.')
+def statsoverview(request):
+    if not isteacher(request.user):
+        messages.error(request, 'Доступ только для учителей.')
         return redirect('home')
-    
     return render(request, 'statistics.html', {'view': 'overview'})
 
 
 @login_required
-def stats_reports(request):
-    # Проверка прав доступа
-    if not is_teacher(request.user):
-        messages.error(request, 'У вас нет доступа к этому разделу.')
+def statsreports(request):
+    if not isteacher(request.user):
+        messages.error(request, 'Доступ только для учителей.')
         return redirect('home')
-    
     return render(request, 'statistics.html', {'view': 'reports'})
 
 
 @login_required
-def stats_analytics(request):
-    # Проверка прав доступа
-    if not is_teacher(request.user):
-        messages.error(request, 'У вас нет доступа к этому разделу.')
+def statsanalytics(request):
+    if not isteacher(request.user):
+        messages.error(request, 'Доступ только для учителей.')
         return redirect('home')
-    
     return render(request, 'statistics.html', {'view': 'analytics'})
 
 
-# Регистрация
 def register(request):
     if request.method == 'POST':
         form = StudentRegistrationForm(request.POST)
@@ -438,9 +389,9 @@ def register(request):
             user = form.save()
             student = form.cleaned_data['student']
             login(request, user)
-            messages.success(request, f"Регистрация успешна! Добро пожаловать, {student.full_name}!")
+            messages.success(request, f'Добро пожаловать, {student.fullname}!')
             return redirect('home')
     else:
         form = StudentRegistrationForm()
-    return render(request, 'register.html', {'form': form})
 
+    return render(request, 'register.html', {'form': form})
