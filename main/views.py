@@ -1,16 +1,15 @@
+from fractions import Fraction
+from datetime import date
+import json
+from collections import defaultdict
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib import messages
-from django.http import JsonResponse
 
 from .forms import StudentRegistrationForm
-from .models import GroupHistory, Student, Group, Lesson, LessonTask, Teacher
-
-from collections import defaultdict
-import json
-from datetime import date
-from fractions import Fraction
+from .models import GroupHistory, Student, Group, Lesson, LessonTask
 
 
 def _normalize_fraction(s: str):
@@ -29,13 +28,13 @@ def _is_correct_for_task(task: dict, useranswer: str, correctanswer: str) -> boo
     ua = (useranswer or "").strip()
     ca = (correctanswer or "").strip()
 
-    # Урок 3: сложение/вычитание дробей — принимаем эквивалентные дроби
+    # Урок 3: дроби — принимаем эквивалентные ответы
     if t in ("add_diff", "sub_diff"):
         f_ua = _normalize_fraction(ua)
         f_ca = _normalize_fraction(ca)
         return (f_ua is not None and f_ca is not None and f_ua == f_ca)
 
-    # Урок 3: привести к общему знаменателю — две дроби через запятую
+    # Урок 3: общий знаменатель — две дроби через запятую
     if t == "common_denom":
         parts_u = [p.strip() for p in (ua or "").split(",")]
         parts_c = [p.strip() for p in (ca or "").split(",")]
@@ -47,11 +46,11 @@ def _is_correct_for_task(task: dict, useranswer: str, correctanswer: str) -> boo
         c2 = _normalize_fraction(parts_c[1])
         return (u1 == c1 and u2 == c2)
 
-    # Урок 2: сравнение дробей — строгие символы > < = (без пробелов)
+    # Сравнение дробей — строго символы > < =
     if t in ("comparesamedenom", "comparediffdenom"):
         return ua.replace(" ", "") == ca.replace(" ", "")
 
-    # Остальное: как было — сравнение строк без учёта регистра
+    # Остальное — сравнение строк
     return ua.lower() == ca.lower()
 
 
@@ -180,7 +179,7 @@ def lessonresult(request, lessondate):
         'lessontask': lessontask,
         'results': results
     }
-    return render(request, 'lessonresult.html', context)
+    return render(request, 'lesson_result.html', context)
 
 
 @login_required
@@ -297,7 +296,6 @@ def statistics(request):
     studentsfullhistory = {}
     for studentid, history in studentshistoryraw.items():
         historysorted = sorted(history, key=lambda x: x['date'])
-
         if not historysorted:
             continue
 
