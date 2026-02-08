@@ -395,3 +395,22 @@ def register(request):
         form = StudentRegistrationForm()
 
     return render(request, 'register.html', {'form': form})
+
+
+# --- aliases for urls.py names (underscore style) ---
+news_archive = newsarchive
+
+tasks_active = tasksactive
+tasks_completed = taskscompleted
+tasks_create = taskscreate
+
+lesson_view = lessonview
+lesson_result = lessonresult
+
+students_list = studentslist
+students_groups = studentsgroups
+students_progress = studentsprogress
+
+stats_overview = statsoverview
+stats_reports = statsreports
+stats_analytics = statsanalytics
