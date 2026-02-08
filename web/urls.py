@@ -27,7 +27,7 @@ urlpatterns = [
 
     # Новости
     path('news/', views.news, name='news'),
-    path('news/archive/', views.news_archive, name='news_archive'),
+    path('news/archive/', views.newsarchive, name='news_archive'),
 
     # Задачи
     path('tasks/', views.tasks, name='tasks'),
