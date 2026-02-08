@@ -116,11 +116,21 @@
             margin-right: 12px;
             color: var(--color-text-primary);
             font-size: 14px;
+            white-space: nowrap;
         }
 
         .topbar__user-info strong {
             color: var(--color-accent-primary);
             font-weight: 600;
+        }
+
+        .topbar__user-info .role-badge {
+            background: var(--color-accent-primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .topbar__user-info .class-badge {
@@ -136,6 +146,7 @@
             display: flex;
             gap: 12px;
             margin-left: auto;
+            align-items: center;
         }
 
         .topbar__link--login {
@@ -246,23 +257,34 @@
         <nav class="topbar__nav">
             <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">📰 Новости</a>
             <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">📝 Задачи</a>
-            <a href="{% url 'students' %}" class="topbar__link {% if request.path == '/students/' %}active{% endif %}">👥 Ученики</a>
-            <a href="{% url 'statistics' %}" class="topbar__link {% if request.path == '/statistics/' %}active{% endif %}">📊 Статистика</a>
+
+            {% if user.is_authenticated and user.teacherprofile_id %}
+                <a href="{% url 'students' %}" class="topbar__link {% if request.path == '/students/' %}active{% endif %}">👥 Ученики</a>
+                <a href="{% url 'statistics' %}" class="topbar__link {% if request.path == '/statistics/' %}active{% endif %}">📊 Статистика</a>
+            {% endif %}
         </nav>
 
         <div class="topbar__auth">
             {% if user.is_authenticated %}
-                {% if user.student %}
-                <div class="topbar__user-info">
-                    <span>👤 <strong>{{ user.student.full_name }}</strong></span>
-                    {% if user.student.class_name %}
-                    <span class="class-badge">{{ user.student.class_name }}</span>
-                    {% endif %}
-                </div>
-                {% elif user.teacher_profile %}
-                <div class="topbar__user-info">
-                    <span>👨‍🏫 <strong>{{ user.teacher_profile.full_name }}</strong></span>
-                </div>
+
+                {% if user.student_id %}
+                    <div class="topbar__user-info">
+                        <span>👤 <strong>{{ user.student.fullname }}</strong></span>
+                        <span class="role-badge">Ученик</span>
+                        {% if user.student.classname %}
+                            <span class="class-badge">{{ user.student.classname }}</span>
+                        {% endif %}
+                    </div>
+                {% elif user.teacherprofile_id %}
+                    <div class="topbar__user-info">
+                        <span>👨‍🏫 <strong>{{ user.teacherprofile.fullname }}</strong></span>
+                        <span class="role-badge">Учитель</span>
+                    </div>
+                {% else %}
+                    <div class="topbar__user-info">
+                        <span>👤 <strong>{{ user.get_full_name|default:user.username }}</strong></span>
+                        <span class="role-badge">Пользователь</span>
+                    </div>
                 {% endif %}
 
                 <form method="post" action="{% url 'logout' %}" style="margin: 0;">
