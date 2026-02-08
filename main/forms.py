@@ -38,8 +38,8 @@ class StudentRegistrationForm(forms.Form):
         user = User.objects.create_user(
             username=username,
             password=password,
-            first_name=student.full_name.split()[1] if len(student.full_name.split()) > 1 else '',
-            last_name=student.full_name.split()[0] if len(student.full_name.split()) > 0 else ''
+            first_name=student.full_name.split()[1] if len(student.fullname.split()) > 1 else '',
+            last_name=student.full_name.split()[0] if len(student.fullname.split()) > 0 else ''
         )
 
         # Связываем с учеником hi
