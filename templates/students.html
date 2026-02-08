@@ -8,13 +8,15 @@
 <div class="card">
     <h2>📊 Результаты учеников по урокам</h2>
     <p style="color: var(--color-text-muted); margin-bottom: 24px;">
-        Оценки учеников из ваших групп: 
-        {% for group in teacher_groups %}
-            <span style="background: var(--color-bg-tertiary); padding: 4px 12px; border-radius: 6px; margin: 0 4px;">Группа {{ group.number }}</span>
+        Оценки учеников из ваших групп:
+        {% for group in teachergroups %}
+            <span style="background: var(--color-bg-tertiary); padding: 4px 12px; border-radius: 6px; margin: 0 4px;">
+                Группа {{ group.number }}
+            </span>
         {% endfor %}
     </p>
-    
-    {% if results_table %}
+
+    {% if resultstable %}
     <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
             <thead>
@@ -40,21 +42,23 @@
                     {% endfor %}
                 </tr>
             </thead>
+
             <tbody>
-                {% for student_data in results_table %}
+                {% for studentdata in resultstable %}
                 <tr style="border-bottom: 1px solid var(--color-border); transition: background 0.2s ease;">
                     <td style="padding: 16px; font-weight: 600; position: sticky; left: 0; background: white; z-index: 5;">
-                        {{ student_data.student.full_name }}
+                        {{ studentdata.student.fullname }}
                     </td>
                     <td style="padding: 16px; text-align: center; color: var(--color-text-secondary);">
-                        {{ student_data.student.class_name|default:"—" }}
+                        {{ studentdata.student.classname|default:"—" }}
                     </td>
                     <td style="padding: 16px; text-align: center;">
                         <span style="background: var(--color-accent-primary); color: white; padding: 4px 12px; border-radius: 6px; font-size: 14px; font-weight: 600;">
-                            {{ student_data.student.current_group.number|default:"—" }}
+                            {{ studentdata.student.currentgroup.number|default:"—" }}
                         </span>
                     </td>
-                    {% for result in student_data.results %}
+
+                    {% for result in studentdata.results %}
                     <td style="padding: 16px; text-align: center;">
                         {% if result.submitted %}
                             {% if result.score %}
@@ -82,8 +86,7 @@
             </tbody>
         </table>
     </div>
-    
-    <!-- Легенда оценок -->
+
     <div style="margin-top: 24px; padding: 20px; background: var(--color-bg-tertiary); border-radius: 12px;">
         <h3 style="color: var(--color-accent-primary); margin-bottom: 16px; font-size: 16px;">📋 Шкала оценок</h3>
         <div style="display: flex; gap: 24px; flex-wrap: wrap;">
@@ -97,7 +100,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="width: 40px; height: 40px; background: #EF5350; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">3-1</div>
-                <span>Нужно улучшить (<50%)</span>
+                <span>Нужно улучшить (&lt;50%)</span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="width: 40px; height: 40px; border: 2px dashed var(--color-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-weight: 700;">—</div>
@@ -105,12 +108,11 @@
             </div>
         </div>
     </div>
-    
-    <!-- Статистика -->
+
     <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
         <div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white;">
             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Всего учеников</div>
-            <div style="font-size: 36px; font-weight: 700;">{{ results_table|length }}</div>
+            <div style="font-size: 36px; font-weight: 700;">{{ resultstable|length }}</div>
         </div>
         <div style="padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; color: white;">
             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Уроков создано</div>
@@ -118,10 +120,10 @@
         </div>
         <div style="padding: 20px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; color: white;">
             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Ваши группы</div>
-            <div style="font-size: 36px; font-weight: 700;">{{ teacher_groups|length }}</div>
+            <div style="font-size: 36px; font-weight: 700;">{{ teachergroups|length }}</div>
         </div>
     </div>
-    
+
     {% else %}
     <div style="text-align: center; padding: 60px 20px; color: var(--color-text-muted);">
         <p style="font-size: 48px; margin-bottom: 16px;">📚</p>
@@ -135,7 +137,7 @@
     tbody tr:hover {
         background: var(--color-bg-tertiary) !important;
     }
-    
+
     @media (max-width: 1200px) {
         table {
             font-size: 14px;

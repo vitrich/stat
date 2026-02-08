@@ -15,11 +15,7 @@
     transition: background 0.2s;
     user-select: none;
 }
-
-.student-checkbox:hover {
-    background: var(--color-bg-secondary);
-}
-
+.student-checkbox:hover { background: var(--color-bg-secondary); }
 .student-checkbox input[type="checkbox"] {
     width: 18px;
     height: 18px;
@@ -27,20 +23,17 @@
     cursor: pointer;
     accent-color: var(--color-accent-primary);
 }
-
 .student-checkbox label {
     cursor: pointer;
     font-size: 15px;
     color: var(--color-text-primary);
     font-weight: 500;
 }
-
 #transitionsChart {
     border: 1px solid var(--color-border);
     border-radius: 12px;
     background: white;
 }
-
 .legend-item {
     display: flex;
     align-items: center;
@@ -51,13 +44,11 @@
     font-size: 14px;
     font-weight: 500;
 }
-
 .legend-color {
     width: 20px;
     height: 20px;
     border-radius: 4px;
 }
-
 .btn {
     background: var(--color-accent-primary);
     color: white;
@@ -69,21 +60,16 @@
     font-weight: 600;
     transition: all 0.2s;
 }
-
 .btn:hover {
     opacity: 0.9;
     transform: translateY(-1px);
 }
-
 .btn--secondary {
     background: var(--color-bg-secondary);
     color: var(--color-text-primary);
     border: 1px solid var(--color-border);
 }
-
-.btn--secondary:hover {
-    background: var(--color-border);
-}
+.btn--secondary:hover { background: var(--color-border); }
 </style>
 
 <!-- Выбор учеников -->
@@ -91,16 +77,12 @@
     <h2 style="color: var(--color-accent-primary); margin-bottom: 20px;">👥 Выбор учеников</h2>
 
     <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-        <button onclick="selectAll()" class="btn btn--secondary">
-            ✓ Выбрать всех
-        </button>
-        <button onclick="deselectAll()" class="btn btn--secondary">
-            ✗ Снять всех
-        </button>
+        <button type="button" onclick="selectAll()" class="btn btn--secondary">✓ Выбрать всех</button>
+        <button type="button" onclick="deselectAll()" class="btn btn--secondary">✗ Снять всех</button>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; max-height: 400px; overflow-y: auto; padding: 8px; background: var(--color-bg-secondary); border-radius: 8px;">
-        {% for student in students_with_transitions %}
+        {% for student in studentswithtransitions %}
             <div class="student-checkbox">
                 <input type="checkbox"
                        id="student_{{ student.id }}"
@@ -109,6 +91,10 @@
                 <label for="student_{{ student.id }}">
                     {{ student.name }}
                 </label>
+            </div>
+        {% empty %}
+            <div style="padding: 16px; color: var(--color-text-muted);">
+                Нет данных о переходах (проверь записи GroupHistory).
             </div>
         {% endfor %}
     </div>
@@ -130,7 +116,7 @@
 
 <script>
 // Данные из Django
-const studentsData = {{ students_json|safe }};
+const studentsData = {{ studentsjson|safe }};
 
 // Цвета для учеников
 const colors = [
@@ -144,12 +130,10 @@ function updateChart() {
     const canvas = document.getElementById('transitionsChart');
     const ctx = canvas.getContext('2d');
 
-    // Очищаем canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Получаем выбранных учеников
     const selectedStudents = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(cb => parseInt(cb.value));
+        .map(cb => parseInt(cb.value, 10));
 
     if (selectedStudents.length === 0) {
         ctx.fillStyle = '#999';
@@ -160,68 +144,62 @@ function updateChart() {
         return;
     }
 
-    // Настройки графика
     const padding = 80;
     const chartWidth = canvas.width - padding * 2;
     const chartHeight = canvas.height - padding * 2;
 
-    // АВТОМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ ДАТ ИЗ ДАННЫХ
-    const dates = [];
-    const dateLabels = [];
-
-    // Собираем все уникальные даты из истории учеников
+    // Собираем все уникальные даты из истории (по всем ученикам)
     const allDates = new Set();
     Object.values(studentsData).forEach(student => {
-        student.history.forEach(point => {
-            allDates.add(point.date);
-        });
+        (student.history || []).forEach(point => allDates.add(point.date));
     });
 
-    // Сортируем даты
-    const sortedDates = Array.from(allDates).sort();
-
-    // Форматируем даты для отображения
-    sortedDates.forEach(dateStr => {
-        dates.push(dateStr);
-
-        // Форматируем дату
+    const dates = Array.from(allDates).sort();
+    const dateLabels = dates.map(dateStr => {
         const date = new Date(dateStr);
         const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-                       'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+                        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
         const day = date.getDate();
         const month = months[date.getMonth()];
-        dateLabels.push(`${day} ${month}`);
+        return `${day} ${month}`;
     });
 
-    // Группы (ось Y)
+    if (dates.length < 2) {
+        ctx.fillStyle = '#999';
+        ctx.font = '18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Недостаточно дат для построения графика', canvas.width / 2, canvas.height / 2);
+        document.getElementById('legend').innerHTML = '';
+        return;
+    }
+
+    // Группы (ось Y) — оставляю как у тебя
     const groups = [1, 2, 2.1, 2.2, 3];
     const groupLabels = ['Группа 1', 'Группа 2', 'Группа 2.1', 'Группа 2.2', 'Группа 3'];
 
-    // Рисуем оси
+    // Оси
     ctx.strokeStyle = '#ddd';
     ctx.lineWidth = 2;
 
-    // Ось Y
     ctx.beginPath();
     ctx.moveTo(padding, padding);
     ctx.lineTo(padding, canvas.height - padding);
     ctx.stroke();
 
-    // Ось X
     ctx.beginPath();
     ctx.moveTo(padding, canvas.height - padding);
     ctx.lineTo(canvas.width - padding, canvas.height - padding);
     ctx.stroke();
 
-    // Подписи оси Y (группы)
+    // Подписи Y + горизонтальная сетка
     ctx.fillStyle = '#333';
     ctx.font = '14px sans-serif';
     ctx.textAlign = 'right';
+
     groups.forEach((group, i) => {
         const y = padding + (chartHeight / (groups.length - 1)) * (groups.length - 1 - i);
         ctx.fillText(groupLabels[i], padding - 10, y + 5);
 
-        // Горизонтальные линии сетки
         ctx.strokeStyle = '#f0f0f0';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -230,13 +208,12 @@ function updateChart() {
         ctx.stroke();
     });
 
-    // Подписи оси X (даты)
+    // Подписи X + вертикальная сетка
     ctx.textAlign = 'center';
     dates.forEach((date, i) => {
         const x = padding + (chartWidth / (dates.length - 1)) * i;
         ctx.fillText(dateLabels[i], x, canvas.height - padding + 25);
 
-        // Вертикальные линии сетки
         ctx.strokeStyle = '#f0f0f0';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -245,29 +222,27 @@ function updateChart() {
         ctx.stroke();
     });
 
-    // Функция преобразования группы в Y координату
     function groupToY(groupNum) {
         const index = groups.indexOf(groupNum);
+        if (index === -1) return null;
         return padding + (chartHeight / (groups.length - 1)) * (groups.length - 1 - index);
     }
 
-    // Функция преобразования даты в X координату
-    function dateToX(date) {
-        const index = dates.indexOf(date);
+    function dateToX(dateStr) {
+        const index = dates.indexOf(dateStr);
+        if (index === -1) return null;
         return padding + (chartWidth / (dates.length - 1)) * index;
     }
 
-    // Рисуем линии для каждого выбранного ученика
     const legend = document.getElementById('legend');
     legend.innerHTML = '';
 
     selectedStudents.forEach((studentId, index) => {
         const student = studentsData[studentId];
-        if (!student) return;
+        if (!student || !student.history) return;
 
         const color = colors[index % colors.length];
 
-        // Добавляем в легенду
         const legendItem = document.createElement('div');
         legendItem.className = 'legend-item';
         legendItem.innerHTML = `
@@ -276,29 +251,29 @@ function updateChart() {
         `;
         legend.appendChild(legendItem);
 
-        // Рисуем линию истории
         ctx.strokeStyle = color;
         ctx.fillStyle = color;
         ctx.lineWidth = 3;
 
         const history = student.history;
 
-        // Рисуем линии между точками
         for (let i = 0; i < history.length; i++) {
             const point = history[i];
             const x = dateToX(point.date);
             const y = groupToY(point.group);
 
-            // Рисуем точку
+            if (x === null || y === null) continue;
+
             ctx.beginPath();
             ctx.arc(x, y, 6, 0, Math.PI * 2);
             ctx.fill();
 
-            // Рисуем линию к следующей точке
             if (i < history.length - 1) {
                 const nextPoint = history[i + 1];
                 const nextX = dateToX(nextPoint.date);
                 const nextY = groupToY(nextPoint.group);
+
+                if (nextX === null || nextY === null) continue;
 
                 ctx.beginPath();
                 ctx.moveTo(x, y);
@@ -319,10 +294,7 @@ function deselectAll() {
     updateChart();
 }
 
-// Инициализация
-window.addEventListener('load', () => {
-    updateChart();
-});
+window.addEventListener('load', () => updateChart());
 </script>
 
 {% endblock %}
