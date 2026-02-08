@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block pagetitle %}{{ lesson.title }}{% endblock %}
-{% block pagedescription %}{% endblock %}
+{% block page_title %}{{ lesson.title }}{% endblock %}
+{% block page_description %}{% endblock %}
 
 {% block content %}
 <div class="card">
@@ -10,13 +10,11 @@
         {{ lesson.date|date:"d.m.Y" }} • {{ lesson.durationminutes }} мин
     </div>
 
-    <!-- Теория -->
     <div style="padding: 24px; background: var(--color-bg-tertiary); border-radius: 12px; margin-bottom: 32px;">
         {{ lesson.theorycontent|safe }}
     </div>
 </div>
 
-<!-- Тест -->
 <div class="card">
     <h2>Тест</h2>
     <p style="color: var(--color-text-muted); margin-bottom: 8px;">
@@ -136,7 +134,6 @@
                             <option value="=">=</option>
                         </select>
 
-                    <!-- Урок 3: общий знаменатель + сложение/вычитание -->
                     {% elif task.type == "common_denom" %}
                         <p style="font-size: 16px; margin-bottom: 12px;">
                             Приведи к общему знаменателю <strong>{{ task.common_den }}</strong>:
@@ -191,6 +188,10 @@
                         <input type="text" name="answer_{{ forloop.counter0 }}" required placeholder="например: 7/12"
                                style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px;">
 
+                    {% else %}
+                        <p style="color: #B71C1C; font-weight: 600;">
+                            Неизвестный тип задания: {{ task.type }}
+                        </p>
                     {% endif %}
                 </div>
             {% endfor %}
