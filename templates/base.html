@@ -42,11 +42,7 @@
             --topbar-height: 64px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
@@ -57,9 +53,7 @@
 
         .topbar {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: var(--topbar-height);
             background: #FFFFFF;
             border-bottom: 1px solid var(--color-border);
@@ -76,6 +70,7 @@
             color: var(--color-accent-primary);
             margin-right: 48px;
             white-space: nowrap;
+            text-decoration: none;
         }
 
         .topbar__nav {
@@ -228,29 +223,15 @@
         }
 
         @media (max-width: 768px) {
-            .topbar__logo {
-                font-size: 18px;
-                margin-right: 16px;
-            }
-
-            .topbar__nav {
-                display: none;
-            }
-
-            .topbar__user-info {
-                font-size: 12px;
-                padding: 6px 10px;
-            }
-
-            .main-content {
-                padding: 16px;
-            }
+            .topbar__logo { font-size: 18px; margin-right: 16px; }
+            .topbar__nav { display: none; }
+            .topbar__user-info { font-size: 12px; padding: 6px 10px; }
+            .main-content { padding: 16px; }
         }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Топбар -->
     <header class="topbar">
         <a class="topbar__logo" href="{% url 'home' %}">Math Letovo Junior</a>
 
@@ -258,7 +239,8 @@
             <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">📰 Новости</a>
             <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">📝 Задачи</a>
 
-            {% if user.is_authenticated and user.teacherprofile_id %}
+            {# Скрываем "Ученики" и "Статистика" только от учеников #}
+            {% if user.is_authenticated and not user.student_id %}
                 <a href="{% url 'students' %}" class="topbar__link {% if request.path == '/students/' %}active{% endif %}">👥 Ученики</a>
                 <a href="{% url 'statistics' %}" class="topbar__link {% if request.path == '/statistics/' %}active{% endif %}">📊 Статистика</a>
             {% endif %}
@@ -298,7 +280,6 @@
         </div>
     </header>
 
-    <!-- Основной контент -->
     <main class="main-content">
         {% if messages %}
             {% for message in messages %}
@@ -313,8 +294,7 @@
             <p>{% block page_description %}Система управления математическими группами{% endblock %}</p>
         </div>
 
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 </body>
 </html>
