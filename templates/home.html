@@ -51,7 +51,7 @@
     {% if lessons %}
     <div style="display: flex; flex-direction: column; gap: 16px;">
         {% for lesson in lessons %}
-        <a href="{% url 'lesson_view' lesson.date %}" style="text-decoration: none; color: inherit;">
+        <a href="{% url 'lessonview' lesson.date %}" style="text-decoration: none; color: inherit;">
             <div style="padding: 20px; border: 2px solid {% if lesson.completed %}#4CAF50{% else %}var(--color-border){% endif %}; border-radius: 12px; transition: all 0.3s ease; background: {% if lesson.completed %}rgba(76, 175, 80, 0.05){% else %}white{% endif %}; cursor: pointer;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="flex: 1;">
