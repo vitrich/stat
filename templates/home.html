@@ -27,7 +27,7 @@
                 <ul>
                     {% for lesson in lessons %}
                         <li>
-                            <a href="{% url 'lesson' lesson.date %}">
+                            <a href="{% url 'lesson_view' lesson_date=lesson.date %}">
                                 {{ lesson.title }} ({{ lesson.date|date:"d.m.Y" }})
                             </a>
                         </li>
