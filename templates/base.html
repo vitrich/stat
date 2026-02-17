@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Math Letovo Junior{% endblock %}</title>
 
-    <!-- MathJax для отображения LaTeX формул -->
+    <!-- MathJax LaTeX -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
         window.MathJax = {
             tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']],
                 processEscapes: true
             },
             options: {
@@ -49,7 +50,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", sans-serif;
             background: var(--color-bg-secondary);
             color: var(--color-text-primary);
             line-height: 1.6;
@@ -70,7 +72,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .topbar__logo {
+        .topbar-logo {
             font-size: 24px;
             font-weight: 700;
             color: var(--color-accent-primary);
@@ -78,14 +80,14 @@
             white-space: nowrap;
         }
 
-        .topbar__nav {
+        .topbar-nav {
             display: flex;
             gap: 8px;
             flex: 1;
             align-items: center;
         }
 
-        .topbar__link {
+        .topbar-link {
             padding: 10px 18px;
             color: var(--color-text-secondary);
             text-decoration: none;
@@ -96,17 +98,17 @@
             position: relative;
         }
 
-        .topbar__link:hover {
+        .topbar-link:hover {
             background: var(--color-blue-light);
             color: var(--color-accent-primary);
         }
 
-        .topbar__link.active {
+        .topbar-link.active {
             background: var(--color-accent-primary);
-            color: white;
+            color: #FFFFFF;
         }
 
-        .topbar__user-info {
+        .topbar-user-info {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -118,43 +120,43 @@
             font-size: 14px;
         }
 
-        .topbar__user-info strong {
+        .topbar-user-info strong {
             color: var(--color-accent-primary);
             font-weight: 600;
         }
 
-        .topbar__user-info .class-badge {
+        .topbar-user-info .class-badge {
             background: var(--color-orange);
-            color: white;
+            color: #FFFFFF;
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .topbar__auth {
+        .topbar-auth {
             display: flex;
             gap: 12px;
             margin-left: auto;
         }
 
-        .topbar__link--login {
+        .topbar-link--login {
             border: 1px solid var(--color-border);
             background: transparent;
         }
 
-        .topbar__link--register {
+        .topbar-link--register {
             background: var(--color-orange);
-            color: white;
+            color: #FFFFFF;
         }
 
-        .topbar__link--register:hover {
+        .topbar-link--register:hover {
             background: var(--color-orange-hover);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
         }
 
-        .topbar__link--logout {
+        .topbar-link--logout {
             background: rgba(239, 83, 80, 0.1);
             color: var(--color-danger);
             border: 1px solid rgba(239, 83, 80, 0.3);
@@ -162,7 +164,7 @@
             font-family: inherit;
         }
 
-        .topbar__link--logout:hover {
+        .topbar-link--logout:hover {
             background: rgba(239, 83, 80, 0.2);
         }
 
@@ -217,16 +219,16 @@
         }
 
         @media (max-width: 768px) {
-            .topbar__logo {
+            .topbar-logo {
                 font-size: 18px;
                 margin-right: 16px;
             }
 
-            .topbar__nav {
+            .topbar-nav {
                 display: none;
             }
 
-            .topbar__user-info {
+            .topbar-user-info {
                 font-size: 12px;
                 padding: 6px 10px;
             }
@@ -236,63 +238,94 @@
             }
         }
     </style>
+
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Топбар -->
-    <header class="topbar">
-        <div class="topbar__logo">📐 Math Letovo Junior</div>
+<header class="topbar">
+    <div class="topbar-logo">Math Letovo Junior</div>
 
-        <nav class="topbar__nav">
-            <a href="{% url 'news' %}" class="topbar__link {% if request.path == '/news/' %}active{% endif %}">📰 Новости</a>
-            <a href="{% url 'tasks' %}" class="topbar__link {% if request.path == '/tasks/' %}active{% endif %}">📝 Задачи</a>
-            <a href="{% url 'students' %}" class="topbar__link {% if request.path == '/students/' %}active{% endif %}">👥 Ученики</a>
-            <a href="{% url 'statistics' %}" class="topbar__link {% if request.path == '/statistics/' %}active{% endif %}">📊 Статистика</a>
-        </nav>
+    <nav class="topbar-nav">
+        <a href="{% url 'news' %}"
+           class="topbar-link {% if request.path == '/news/' %}active{% endif %}">
+            Новости
+        </a>
+        <a href="{% url 'tasks' %}"
+           class="topbar-link {% if request.path == '/tasks/' %}active{% endif %}">
+            Задачи
+        </a>
+        <a href="{% url 'students' %}"
+           class="topbar-link {% if request.path == '/students/' %}active{% endif %}">
+            Ученики
+        </a>
+        <a href="{% url 'statistics' %}"
+           class="topbar-link {% if request.path == '/statistics/' %}active{% endif %}">
+            Статистика
+        </a>
+    </nav>
 
-        <div class="topbar__auth">
-            {% if user.is_authenticated %}
-                {% if user.student %}
-                <div class="topbar__user-info">
-                    <span>👤 <strong>{{ user.student.full_name }}</strong></span>
+    <div class="topbar-auth">
+        {% if user.is_authenticated %}
+            {% if user.student %}
+                <div class="topbar-user-info">
+                    <span><strong>{{ user.student.full_name }}</strong></span>
                     {% if user.student.class_name %}
-                    <span class="class-badge">{{ user.student.class_name }}</span>
+                        <span class="class-badge">{{ user.student.class_name }}</span>
                     {% endif %}
                 </div>
-                {% elif user.teacher_profile %}
-                <div class="topbar__user-info">
-                    <span>👨‍🏫 <strong>{{ user.teacher_profile.full_name }}</strong></span>
+            {% elif user.teacherprofile %}
+                <div class="topbar-user-info">
+                    <span><strong>{{ user.teacherprofile.full_name }}</strong></span>
                 </div>
-                {% endif %}
-
-                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
-                    {% csrf_token %}
-                    <button type="submit" class="topbar__link topbar__link--logout">🚪 Выход</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="topbar__link topbar__link--login">🔑 Вход</a>
-                <a href="{% url 'register' %}" class="topbar__link topbar__link--register">✨ Регистрация</a>
             {% endif %}
-        </div>
-    </header>
 
-    <!-- Основной контент -->
-    <main class="main-content">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="card" style="background: {% if message.tags == 'success' %}#E8F5E9{% elif message.tags == 'error' %}#FFEBEE{% elif message.tags == 'warning' %}#FFF3E0{% else %}#E3F2FD{% endif %}; border-left: 4px solid {% if message.tags == 'success' %}#4CAF50{% elif message.tags == 'error' %}#EF5350{% elif message.tags == 'warning' %}#FFA726{% else %}#1976D2{% endif %};">
-                    {{ message }}
-                </div>
-            {% endfor %}
+            <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit"
+                        class="topbar-link topbar-link--logout">
+                    Выйти
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}"
+               class="topbar-link topbar-link--login">
+                Войти
+            </a>
+            <a href="{% url 'register' %}"
+               class="topbar-link topbar-link--register">
+                Регистрация
+            </a>
         {% endif %}
+    </div>
+</header>
 
-        <div class="content-header">
-            <h1>{% block page_title %}Добро пожаловать{% endblock %}</h1>
-            <p>{% block page_description %}Система управления математическими группами{% endblock %}</p>
-        </div>
+<main class="main-content">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="card"
+                 style="
+                     background:
+                         {% if message.tags == 'success' %}#E8F5E9
+                         {% elif message.tags == 'error' %}#FFEBEE
+                         {% elif message.tags == 'warning' %}#FFF3E0
+                         {% else %}#E3F2FD{% endif %};
+                     border-left: 4px solid
+                         {% if message.tags == 'success' %}#4CAF50
+                         {% elif message.tags == 'error' %}#EF5350
+                         {% elif message.tags == 'warning' %}#FFA726
+                         {% else %}#1976D2{% endif %};
+                 ">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
 
-        {% block content %}
-        {% endblock %}
-    </main>
+    <div class="content-header">
+        <h1>{% block page_title %}Добро пожаловать{% endblock %}</h1>
+        <p>{% block page_description %}Система управления математическими группами{% endblock %}</p>
+    </div>
+
+    {% block content %}{% endblock %}
+</main>
 </body>
 </html>
