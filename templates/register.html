@@ -6,179 +6,32 @@
 
 {% block content %}
     <style>
-        .auth-container {
-            max-width: 420px;
-            margin: 3rem auto;
-            padding: 0;
-        }
-
-        .auth-card {
-            background: #FFFFFF;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            padding: 2.5rem;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-header h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-header p {
-            color: #64748b;
-            font-size: 0.95rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .form-input,
-        .form-select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s;
-            background: #FFFFFF;
-        }
-
-        .form-input:focus,
-        .form-select:focus {
-            outline: none;
-            border-color: #1976D2;
-            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
-        }
-
-        .form-select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333455' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            padding-right: 2.5rem;
-        }
-
-        .help-text {
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 0.375rem;
-            line-height: 1.4;
-        }
-
-        .error-message {
-            font-size: 0.85rem;
-            color: #dc2626;
-            margin-top: 0.375rem;
-        }
-
-        .form-errors {
-            background: #fee2e2;
-            border: 1px solid #fca5a5;
-            color: #991b1b;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-errors ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .form-errors li {
-            margin-bottom: 0.5rem;
-        }
-
-        .form-errors li:last-child {
-            margin-bottom: 0;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 0.875rem;
-            background: #1976D2 !important;
-            color: #FFFFFF !important;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 0.5rem;
-        }
-
-        .btn-submit:hover {
-            background: #1565C0 !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .auth-footer-text {
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-
-        .auth-footer a {
-            color: #1976D2;
-            text-decoration: none;
-            font-weight: 600;
-            margin-left: 0.25rem;
-        }
-
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .instruction-box {
-            background: #fef3c7;
-            border: 1px solid #fde047;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .instruction-box h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #92400e;
-            margin-bottom: 0.5rem;
-        }
-
-        .instruction-box ol {
-            margin: 0;
-            padding-left: 1.25rem;
-            color: #92400e;
-        }
-
-        .instruction-box li {
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
-        }
+        .auth-container { max-width: 420px; margin: 3rem auto; padding: 0; }
+        .auth-card { background: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07); padding: 2.5rem; }
+        .auth-header { text-align: center; margin-bottom: 2rem; }
+        .auth-header h2 { font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+        .auth-header p { color: #64748b; font-size: 0.95rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-weight: 600; color: #1e293b; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .form-input, .form-select { width: 100%; padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; transition: all 0.2s; background: #FFFFFF; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #1976D2; box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1); }
+        .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333455' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+        .help-text { font-size: 0.8rem; color: #64748b; margin-top: 0.375rem; line-height: 1.4; }
+        .error-message { font-size: 0.85rem; color: #dc2626; margin-top: 0.375rem; }
+        .form-errors { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        .form-errors ul { list-style: none; margin: 0; padding: 0; }
+        .form-errors li { margin-bottom: 0.5rem; }
+        .form-errors li:last-child { margin-bottom: 0; }
+        .btn-submit { width: 100%; padding: 0.875rem; background: #1976D2 !important; color: #FFFFFF !important; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; }
+        .btn-submit:hover { background: #1565C0 !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3); }
+        .auth-footer { text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
+        .auth-footer-text { color: #64748b; font-size: 0.9rem; }
+        .auth-footer a { color: #1976D2; text-decoration: none; font-weight: 600; margin-left: 0.25rem; }
+        .auth-footer a:hover { text-decoration: underline; }
+        .instruction-box { background: #fef3c7; border: 1px solid #fde047; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+        .instruction-box h3 { font-size: 0.9rem; font-weight: 600; color: #92400e; margin-bottom: 0.5rem; }
+        .instruction-box ol { margin: 0; padding-left: 1.25rem; color: #92400e; }
+        .instruction-box li { font-size: 0.85rem; margin-bottom: 0.25rem; }
     </style>
 
     <div class="auth-container">
@@ -212,9 +65,7 @@
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="{{ form.student.id_for_label }}" class="form-label">
-                        {{ form.student.label }}
-                    </label>
+                    <label for="{{ form.student.id_for_label }}" class="form-label">{{ form.student.label }}</label>
                     <select name="{{ form.student.name }}"
                             id="{{ form.student.id_for_label }}"
                             class="form-select"
@@ -234,17 +85,13 @@
                     {% endif %}
                     {% if form.student.errors %}
                         <div class="error-message">
-                            {% for error in form.student.errors %}
-                                {{ error }}
-                            {% endfor %}
+                            {% for error in form.student.errors %}{{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.username.id_for_label }}" class="form-label">
-                        {{ form.username.label }}
-                    </label>
+                    <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
                     <input type="text"
                            name="{{ form.username.name }}"
                            id="{{ form.username.id_for_label }}"
@@ -257,17 +104,13 @@
                     {% endif %}
                     {% if form.username.errors %}
                         <div class="error-message">
-                            {% for error in form.username.errors %}
-                                {{ error }}
-                            {% endfor %}
+                            {% for error in form.username.errors %}{{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.password1.id_for_label }}" class="form-label">
-                        {{ form.password1.label }}
-                    </label>
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
                     <input type="password"
                            name="{{ form.password1.name }}"
                            id="{{ form.password1.id_for_label }}"
@@ -279,17 +122,13 @@
                     {% endif %}
                     {% if form.password1.errors %}
                         <div class="error-message">
-                            {% for error in form.password1.errors %}
-                                {{ error }}
-                            {% endfor %}
+                            {% for error in form.password1.errors %}{{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.password2.id_for_label }}" class="form-label">
-                        {{ form.password2.label }}
-                    </label>
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
                     <input type="password"
                            name="{{ form.password2.name }}"
                            id="{{ form.password2.id_for_label }}"
@@ -301,16 +140,12 @@
                     {% endif %}
                     {% if form.password2.errors %}
                         <div class="error-message">
-                            {% for error in form.password2.errors %}
-                                {{ error }}
-                            {% endfor %}
+                            {% for error in form.password2.errors %}{{ error }}{% endfor %}
                         </div>
                     {% endif %}
                 </div>
 
-                <button type="submit" class="btn-submit">
-                    Зарегистрироваться
-                </button>
+                <button type="submit" class="btn-submit">Зарегистрироваться</button>
             </form>
 
             <div class="auth-footer">

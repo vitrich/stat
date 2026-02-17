@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Math Letovo Junior{% endblock %}</title>
 
-    <!-- MathJax LaTeX -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -43,15 +42,10 @@
             --topbar-height: 64px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            "Helvetica Neue", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif;
             background: var(--color-bg-secondary);
             color: var(--color-text-primary);
             line-height: 1.6;
@@ -59,9 +53,7 @@
 
         .topbar {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: var(--topbar-height);
             background: #FFFFFF;
             border-bottom: 1px solid var(--color-border);
@@ -138,6 +130,7 @@
             display: flex;
             gap: 12px;
             margin-left: auto;
+            align-items: center;
         }
 
         .topbar-link--login {
@@ -219,23 +212,10 @@
         }
 
         @media (max-width: 768px) {
-            .topbar-logo {
-                font-size: 18px;
-                margin-right: 16px;
-            }
-
-            .topbar-nav {
-                display: none;
-            }
-
-            .topbar-user-info {
-                font-size: 12px;
-                padding: 6px 10px;
-            }
-
-            .main-content {
-                padding: 16px;
-            }
+            .topbar-logo { font-size: 18px; margin-right: 16px; }
+            .topbar-nav { display: none; }
+            .topbar-user-info { font-size: 12px; padding: 6px 10px; }
+            .main-content { padding: 16px; }
         }
     </style>
 
@@ -246,22 +226,10 @@
     <div class="topbar-logo">Math Letovo Junior</div>
 
     <nav class="topbar-nav">
-        <a href="{% url 'news' %}"
-           class="topbar-link {% if request.path == '/news/' %}active{% endif %}">
-            Новости
-        </a>
-        <a href="{% url 'tasks' %}"
-           class="topbar-link {% if request.path == '/tasks/' %}active{% endif %}">
-            Задачи
-        </a>
-        <a href="{% url 'students' %}"
-           class="topbar-link {% if request.path == '/students/' %}active{% endif %}">
-            Ученики
-        </a>
-        <a href="{% url 'statistics' %}"
-           class="topbar-link {% if request.path == '/statistics/' %}active{% endif %}">
-            Статистика
-        </a>
+        <a href="{% url 'news' %}" class="topbar-link {% if request.path == '/news/' %}active{% endif %}">Новости</a>
+        <a href="{% url 'tasks' %}" class="topbar-link {% if request.path == '/tasks/' %}active{% endif %}">Задачи</a>
+        <a href="{% url 'students' %}" class="topbar-link {% if request.path == '/students/' %}active{% endif %}">Ученики</a>
+        <a href="{% url 'statistics' %}" class="topbar-link {% if request.path == '/statistics/' %}active{% endif %}">Статистика</a>
     </nav>
 
     <div class="topbar-auth">
@@ -281,20 +249,11 @@
 
             <form method="post" action="{% url 'logout' %}" style="margin: 0;">
                 {% csrf_token %}
-                <button type="submit"
-                        class="topbar-link topbar-link--logout">
-                    Выйти
-                </button>
+                <button type="submit" class="topbar-link topbar-link--logout">Выйти</button>
             </form>
         {% else %}
-            <a href="{% url 'login' %}"
-               class="topbar-link topbar-link--login">
-                Войти
-            </a>
-            <a href="{% url 'register' %}"
-               class="topbar-link topbar-link--register">
-                Регистрация
-            </a>
+            <a href="{% url 'login' %}" class="topbar-link topbar-link--login">Войти</a>
+            <a href="{% url 'register' %}" class="topbar-link topbar-link--register">Регистрация</a>
         {% endif %}
     </div>
 </header>
@@ -305,15 +264,15 @@
             <div class="card"
                  style="
                      background:
-                         {% if message.tags == 'success' %}#E8F5E9
-                         {% elif message.tags == 'error' %}#FFEBEE
-                         {% elif message.tags == 'warning' %}#FFF3E0
-                         {% else %}#E3F2FD{% endif %};
+                     {% if message.tags == 'success' %}#E8F5E9
+                     {% elif message.tags == 'error' %}#FFEBEE
+                     {% elif message.tags == 'warning' %}#FFF3E0
+                     {% else %}#E3F2FD{% endif %};
                      border-left: 4px solid
-                         {% if message.tags == 'success' %}#4CAF50
-                         {% elif message.tags == 'error' %}#EF5350
-                         {% elif message.tags == 'warning' %}#FFA726
-                         {% else %}#1976D2{% endif %};
+                     {% if message.tags == 'success' %}#4CAF50
+                     {% elif message.tags == 'error' %}#EF5350
+                     {% elif message.tags == 'warning' %}#FFA726
+                     {% else %}#1976D2{% endif %};
                  ">
                 {{ message }}
             </div>

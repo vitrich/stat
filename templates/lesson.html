@@ -11,12 +11,7 @@
             {{ lesson.date|date:"d.m.Y" }} • {{ lesson.duration_minutes }} минут
         </div>
 
-        <div style="
-            padding: 24px;
-            background: var(--color-bg-tertiary);
-            border-radius: 12px;
-            margin-bottom: 32px;
-        ">
+        <div style="padding: 24px; background: var(--color-bg-tertiary); border-radius: 12px; margin-bottom: 32px;">
             {{ lesson.theory|safe }}
         </div>
     </div>
@@ -28,27 +23,10 @@
         </p>
 
         {% if already_submitted %}
-            <div style="
-                padding: 24px;
-                background: #E8F5E9;
-                border: 2px solid #4CAF50;
-                border-radius: 12px;
-                text-align: center;
-                margin-top: 24px;
-            ">
-                <p style="font-size: 20px; color: #2E7D32; margin-bottom: 16px;">
-                    Тест уже сдан!
-                </p>
+            <div style="padding: 24px; background: #E8F5E9; border: 2px solid #4CAF50; border-radius: 12px; text-align: center; margin-top: 24px;">
+                <p style="font-size: 20px; color: #2E7D32; margin-bottom: 16px;">Тест уже сдан!</p>
                 <a href="{% url 'lesson_result' lesson.date %}"
-                   style="
-                       display: inline-block;
-                       padding: 12px 24px;
-                       background: #4CAF50;
-                       color: #FFFFFF;
-                       text-decoration: none;
-                       border-radius: 8px;
-                       font-weight: 600;
-                   ">
+                   style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-weight: 600;">
                     Посмотреть результаты
                 </a>
             </div>
@@ -65,104 +43,46 @@
                         border: 2px solid {% if task.difficulty == 'hard' %}#FF6B35{% else %}var(--color-border){% endif %};
                     ">
                         {% if task.difficulty == 'hard' %}
-                            <div style="
-                                background: #FF6B35;
-                                color: #FFFFFF;
-                                padding: 8px 16px;
-                                border-radius: 6px;
-                                display: inline-block;
-                                margin-bottom: 12px;
-                                font-weight: 600;
-                                font-size: 14px;
-                            ">
+                            <div style="background: #FF6B35; color: #FFFFFF; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-bottom: 12px; font-weight: 600; font-size: 14px;">
                                 Задание повышенной сложности
                             </div>
                         {% endif %}
 
-                        <p style="
-                            font-weight: 600;
-                            color: var(--color-accent-primary);
-                            margin-bottom: 16px;
-                            font-size: 18px;
-                        ">
+                        <p style="font-weight: 600; color: var(--color-accent-primary); margin-bottom: 16px; font-size: 18px;">
                             Задание {{ forloop.counter }} из {{ tasks|length }}
                         </p>
 
-                        {# дальше — твоя логика вывода разных типов task.type,
-                           как у тебя была, только внутри этого блока #}
-                        {# пример для одного типа: #}
                         {% if task.type == 'classify' %}
                             <p style="font-size: 16px; margin-bottom: 12px;">
                                 К какой группе относится дробь
-                                <code style="
-                                    font-size: 20px;
-                                    background: #FFFFFF;
-                                    padding: 4px 12px;
-                                    border-radius: 6px;
-                                    color: var(--color-accent-primary);
-                                ">
+                                <code style="font-size: 20px; background: #FFFFFF; padding: 4px 12px; border-radius: 6px; color: var(--color-accent-primary);">
                                     {{ task.numerator }}/{{ task.denominator }}
                                 </code>?
                             </p>
                             <select name="answer_{{ forloop.counter0 }}" required
-                                    style="
-                                        width: 100%;
-                                        padding: 12px;
-                                        border: 2px solid var(--color-border);
-                                        border-radius: 8px;
-                                        font-size: 16px;
-                                        background: #FFFFFF;
-                                    ">
+                                    style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 16px; background: #FFFFFF;">
                                 <option value="">...</option>
-                                <option value="proper">Правильная дробь</option>
-                                <option value="improper">Неправильная дробь</option>
+                                <option value="proper">Правильная</option>
+                                <option value="improper">Неправильная</option>
                             </select>
                         {% endif %}
-                        {# остальные ветки elif оставь по аналогии #}
                     </div>
                 {% endfor %}
 
                 <div style="margin-top: 32px; text-align: center;">
                     <button type="submit"
-                            style="
-                                padding: 16px 48px;
-                                background: var(--color-accent-primary);
-                                color: #FFFFFF;
-                                border: none;
-                                border-radius: 12px;
-                                font-size: 18px;
-                                font-weight: 600;
-                                cursor: pointer;
-                                transition: all 0.3s ease;
-                                box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-                            ">
+                            style="padding: 16px 48px; background: var(--color-accent-primary); color: #FFFFFF; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);">
                         Отправить ответы
                     </button>
                 </div>
             </form>
+
+            <style>
+                code { font-family: "Courier New", monospace; }
+                button:hover { background: var(--color-accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(25, 118, 210, 0.5); }
+                button:active { transform: translateY(0); }
+                input:focus, select:focus { outline: none; border-color: var(--color-accent-primary); box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2); }
+            </style>
         {% endif %}
     </div>
-
-    <style>
-        code {
-            font-family: "Courier New", monospace;
-        }
-
-        button:hover {
-            background: var(--color-accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.5);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--color-accent-primary);
-            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
-        }
-    </style>
 {% endblock %}
