@@ -1,0 +1,440 @@
+<div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6;">
+    <h2 style="color: #1976D2; border-bottom: 2px solid #1976D2; padding-bottom: 10px;">➕➖ Сложение и вычитание дробей с разными знаменателями</h2>
+
+    <!-- ========== БЛОК EXETER: Задача-открытие ========== -->
+    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e0e0e0; padding: 25px; border-radius: 15px; margin: 25px 0; border: 2px solid #e94560;">
+        <h4 style="color: #e94560; margin-top: 0; text-align: center; font-size: 20px;">🧩 Задача для размышления</h4>
+        <div style="background: rgba(255,255,255,0.08); padding: 20px; border-radius: 10px; font-size: 17px;">
+            <p style="margin-top: 0;">Маша съела <strong style="color: #FDD835;">$\frac{1}{3}$</strong> пиццы, а Петя съел <strong style="color: #FDD835;">$\frac{1}{4}$</strong> пиццы.</p>
+            <p>Какую часть пиццы они съели вместе?</p>
+            <p style="margin-bottom: 0; color: #aaa; font-style: italic;">💭 Подсказка: Можно ли просто сложить числители? Почему «$\frac{1}{3} + \frac{1}{4}$» — это <em>не</em> «$\frac{2}{7}$»?</p>
+        </div>
+    </div>
+
+    <!-- ========== Визуальное объяснение «почему не 2/7» на пицце ========== -->
+    <div style="background: #FFF3E0; padding: 25px; border-radius: 15px; margin: 25px 0; border: 2px solid #FF9800;">
+        <h4 style="color: #E65100; margin-top: 0; text-align: center;">🍕 Почему $\frac{1}{3} + \frac{1}{4} \neq \frac{2}{7}$?</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0;">
+            <div style="text-align: center; background: white; padding: 15px; border-radius: 10px;">
+                <div style="font-size: 16px; color: #E65100; font-weight: 600; margin-bottom: 10px;">❌ Неправильно</div>
+                <canvas id="pizzaWrong" width="160" height="160"></canvas>
+                <div style="margin-top: 8px; font-size: 15px;">$\frac{2}{7}$ ≈ 28.6% пиццы</div>
+            </div>
+            <div style="text-align: center; background: white; padding: 15px; border-radius: 10px;">
+                <div style="font-size: 16px; color: #2E7D32; font-weight: 600; margin-bottom: 10px;">✅ Правильно</div>
+                <canvas id="pizzaRight" width="160" height="160"></canvas>
+                <div style="margin-top: 8px; font-size: 15px;">$\frac{7}{12}$ ≈ 58.3% пиццы</div>
+            </div>
+        </div>
+        <p style="text-align: center; margin-bottom: 0; font-size: 15px;">Куски <strong>разного размера</strong> — нельзя складывать напрямую!<br>Сначала нужно нарезать пиццу на <strong>одинаковые кусочки</strong>.</p>
+    </div>
+
+
+    <!-- ========== 1. СЛОЖЕНИЕ ========== -->
+    <h3 style="color: #FF6B35; margin-top: 40px;">1️⃣ Сложение дробей с разными знаменателями</h3>
+
+    <div style="background: #E3F2FD; padding: 15px; border-left: 4px solid #1976D2; margin: 15px 0;">
+        <p style="margin-top: 0;"><strong>Алгоритм:</strong></p>
+        <ol style="margin-bottom: 0;">
+            <li>Найти <strong>НОК</strong> (наименьшее общее кратное) знаменателей</li>
+            <li>Привести обе дроби к <strong>общему знаменателю</strong></li>
+            <li>Сложить числители, знаменатель оставить общим</li>
+            <li>Сократить результат, если возможно</li>
+        </ol>
+    </div>
+
+    <!-- Пошаговая пицца: 1/3 + 1/4 -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; margin: 25px 0;">
+        <h4 style="color: white; margin-top: 0; text-align: center;">🍕 Решаем задачу Маши и Пети</h4>
+        <div style="background: rgba(255,255,255,0.12); padding: 20px; border-radius: 10px;">
+
+            <!-- Шаг 1: исходные дроби -->
+            <div style="text-align: center; margin-bottom: 15px; font-size: 16px; opacity: 0.9;">Шаг 1: Рисуем, что съел каждый</div>
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; align-items: center; margin-bottom: 20px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; margin-bottom: 5px;">Маша: $\frac{1}{3}$</div>
+                    <canvas id="pizzaStep1a" width="140" height="140"></canvas>
+                    <div style="font-size: 13px; opacity: 0.8; margin-top: 4px;">1 из 3 кусков</div>
+                </div>
+                <div style="font-size: 32px; font-weight: bold;">+</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; margin-bottom: 5px;">Петя: $\frac{1}{4}$</div>
+                    <canvas id="pizzaStep1b" width="140" height="140"></canvas>
+                    <div style="font-size: 13px; opacity: 0.8; margin-top: 4px;">1 из 4 кусков</div>
+                </div>
+            </div>
+
+            <!-- Шаг 2: приведение к общему знаменателю -->
+            <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 8px; margin: 15px 0; font-size: 16px;">
+                ⬇️ Шаг 2: Режем на одинаковые кусочки — НОК(3, 4) = <strong>12</strong>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; align-items: center; margin: 20px 0;">
+                <div style="text-align: center;">
+                    <div style="font-size: 16px; margin-bottom: 5px;">$\frac{1}{3} = \frac{4}{12}$</div>
+                    <canvas id="pizzaStep2a" width="140" height="140"></canvas>
+                    <div style="font-size: 13px; opacity: 0.8; margin-top: 4px;">4 из 12 кусочков</div>
+                </div>
+                <div style="font-size: 32px; font-weight: bold;">+</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 16px; margin-bottom: 5px;">$\frac{1}{4} = \frac{3}{12}$</div>
+                    <canvas id="pizzaStep2b" width="140" height="140"></canvas>
+                    <div style="font-size: 13px; opacity: 0.8; margin-top: 4px;">3 из 12 кусочков</div>
+                </div>
+            </div>
+
+            <!-- Шаг 3: результат -->
+            <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 8px; margin: 15px 0; font-size: 16px;">
+                ⬇️ Шаг 3: Складываем кусочки — 4 + 3 = <strong>7</strong>
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <canvas id="pizzaStep3" width="160" height="160"></canvas>
+                <div style="font-size: 13px; opacity: 0.8; margin-top: 4px;">7 из 12 кусочков</div>
+            </div>
+
+            <div style="text-align: center; margin-top: 15px; padding: 15px; background: #4CAF50; border-radius: 10px; font-size: 20px; font-weight: bold;">
+                ✅ $\frac{1}{3} + \frac{1}{4} = \frac{4}{12} + \frac{3}{12} = \frac{7}{12}$
+            </div>
+        </div>
+    </div>
+
+    <!-- Ещё один пример: пошаговая карточка -->
+    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: #333; padding: 25px; border-radius: 15px; margin: 25px 0;">
+        <h4 style="margin-top: 0; text-align: center;">🔄 Пример: $\frac{3}{8} + \frac{5}{6}$</h4>
+        <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px;">
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="text-align: center; padding: 15px; background: #E3F2FD; border-radius: 8px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #1976D2;">$\frac{3}{8}$</div>
+                </div>
+                <div style="align-self: center; font-size: 30px;">+</div>
+                <div style="text-align: center; padding: 15px; background: #FFE0B2; border-radius: 8px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #FF6B35;">$\frac{5}{6}$</div>
+                </div>
+            </div>
+            <div style="text-align: center; padding: 12px; background: #FFF3E0; border-radius: 8px; margin: 15px 0; font-weight: 600;">
+                ⬇️ НОК(8, 6) = 24
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                <div style="padding: 15px; background: #E3F2FD; border-radius: 8px; border: 2px solid #1976D2;">
+                    <div style="text-align: center; margin-bottom: 10px;">$\frac{3}{8} = \frac{3 \times 3}{8 \times 3}$</div>
+                    <div style="text-align: center; font-size: 22px; font-weight: bold; color: #1976D2;">$= \frac{9}{24}$</div>
+                </div>
+                <div style="padding: 15px; background: #FFE0B2; border-radius: 8px; border: 2px solid #FF6B35;">
+                    <div style="text-align: center; margin-bottom: 10px;">$\frac{5}{6} = \frac{5 \times 4}{6 \times 4}$</div>
+                    <div style="text-align: center; font-size: 22px; font-weight: bold; color: #FF6B35;">$= \frac{20}{24}$</div>
+                </div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #C8E6C9; border-radius: 8px;">
+                <div style="font-size: 18px; font-weight: 600;">9 + 20 = 29</div>
+                <div style="font-size: 22px; font-weight: bold; color: #4CAF50; margin-top: 10px;">
+                    ✅ $\frac{3}{8} + \frac{5}{6} = \frac{9}{24} + \frac{20}{24} = \frac{29}{24} = 1\frac{5}{24}$
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========== 2. ВЫЧИТАНИЕ ========== -->
+    <h3 style="color: #FF6B35; margin-top: 40px;">2️⃣ Вычитание дробей с разными знаменателями</h3>
+    <p>Вычитание работает <strong>точно так же</strong>, только вместо сложения числителей — <strong>вычитаем</strong>.</p>
+
+    <!-- Пицца-вычитание -->
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 15px; margin: 25px 0;">
+        <h4 style="color: white; margin-top: 0; text-align: center;">🍕 Вычитание на пицце: $\frac{3}{4} - \frac{1}{3}$</h4>
+        <div style="background: rgba(255,255,255,0.12); padding: 20px; border-radius: 10px;">
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: center;">
+                <div style="text-align: center;">
+                    <div style="font-size: 16px; margin-bottom: 5px;">Было: $\frac{3}{4} = \frac{9}{12}$</div>
+                    <canvas id="pizzaSubA" width="140" height="140"></canvas>
+                    <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">9 из 12</div>
+                </div>
+                <div style="font-size: 32px; font-weight: bold;">−</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 16px; margin-bottom: 5px;">Съели: $\frac{1}{3} = \frac{4}{12}$</div>
+                    <canvas id="pizzaSubB" width="140" height="140"></canvas>
+                    <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">4 из 12</div>
+                </div>
+                <div style="font-size: 32px; font-weight: bold;">=</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 16px; margin-bottom: 5px;">Осталось: $\frac{5}{12}$</div>
+                    <canvas id="pizzaSubC" width="140" height="140"></canvas>
+                    <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">5 из 12</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.2); border-radius: 8px; font-size: 16px;">
+                НОК(4, 3) = 12 → $\frac{9}{12} - \frac{4}{12} = \frac{5}{12}$
+            </div>
+        </div>
+    </div>
+
+    <!-- Пример вычитания: карточка -->
+    <div style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: #333; padding: 25px; border-radius: 15px; margin: 25px 0;">
+        <h4 style="margin-top: 0; text-align: center;">🔄 Пример: $\frac{7}{10} - \frac{2}{15}$</h4>
+        <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px;">
+            <div style="text-align: center; padding: 12px; background: #FFF3E0; border-radius: 8px; margin-bottom: 15px; font-weight: 600;">
+                НОК(10, 15) = 30
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                <div style="padding: 15px; background: #E3F2FD; border-radius: 8px; border: 2px solid #1976D2; text-align: center;">
+                    <div>$\frac{7}{10} = \frac{7 \times 3}{10 \times 3} = \frac{21}{30}$</div>
+                </div>
+                <div style="padding: 15px; background: #FFE0B2; border-radius: 8px; border: 2px solid #FF6B35; text-align: center;">
+                    <div>$\frac{2}{15} = \frac{2 \times 2}{15 \times 2} = \frac{4}{30}$</div>
+                </div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #C8E6C9; border-radius: 8px;">
+                <div style="font-size: 22px; font-weight: bold; color: #4CAF50;">
+                    ✅ $\frac{21}{30} - \frac{4}{30} = \frac{17}{30}$
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========== 3. ВЫДЕЛЕНИЕ ЦЕЛОЙ ЧАСТИ ========== -->
+    <h3 style="color: #FF6B35; margin-top: 40px;">3️⃣ Если числитель больше знаменателя</h3>
+    <div style="background: #E3F2FD; padding: 15px; border-left: 4px solid #1976D2; margin: 15px 0;">
+        <p style="margin-top: 0;"><strong>Правило:</strong> Раздели числитель на знаменатель. Частное — целая часть, остаток — новый числитель.</p>
+        <p style="margin-bottom: 0;"><strong>Пример:</strong> $\frac{29}{24}$: $29 \div 24 = 1$ (остаток 5) → $1\frac{5}{24}$</p>
+    </div>
+
+
+    <!-- ========== ИНТЕРАКТИВНЫЙ ТРЕНАЖЁР ========== -->
+    <div style="background: #FFF; border: 3px solid #1976D2; border-radius: 15px; padding: 25px; margin: 30px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <h4 style="color: #1976D2; margin-top: 0; text-align: center;">🍕 Тренажёр: складывай и вычитай с пиццей!</h4>
+
+        <div style="display: grid; grid-template-columns: 2fr auto 2fr; gap: 15px; align-items: end; margin: 20px 0;">
+            <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">Числитель:</label>
+                        <input type="number" id="f1n" style="width: 100%; padding: 10px; border: 2px solid #1976D2; border-radius: 8px; text-align: center; font-size: 16px;" value="1" min="1" max="50">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">Знаменатель:</label>
+                        <input type="number" id="f1d" style="width: 100%; padding: 10px; border: 2px solid #1976D2; border-radius: 8px; text-align: center; font-size: 16px;" value="3" min="1" max="50">
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; padding-bottom: 5px;">
+                <select id="op" style="padding: 10px 15px; font-size: 22px; border: 2px solid #FF6B35; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    <option value="+">+</option>
+                    <option value="−">−</option>
+                </select>
+            </div>
+
+            <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">Числитель:</label>
+                        <input type="number" id="f2n" style="width: 100%; padding: 10px; border: 2px solid #FF6B35; border-radius: 8px; text-align: center; font-size: 16px;" value="1" min="1" max="50">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">Знаменатель:</label>
+                        <input type="number" id="f2d" style="width: 100%; padding: 10px; border: 2px solid #FF6B35; border-radius: 8px; text-align: center; font-size: 16px;" value="4" min="1" max="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="solve()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(102,126,234,0.4);">
+            🍕 Посчитать и показать на пицце!
+        </button>
+
+        <div id="result" style="margin-top: 20px; display: none;">
+            <div style="padding: 20px; background: #E3F2FD; border-radius: 10px;">
+                <div id="steps" style="line-height: 2; font-size: 16px;"></div>
+                <div style="display: flex; justify-content: center; gap: 15px; align-items: center; margin-top: 20px; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 13px; color: #1976D2; font-weight: 600;">Дробь 1</div>
+                        <canvas id="pc1" width="130" height="130"></canvas>
+                    </div>
+                    <div style="font-size: 28px; font-weight: bold; color: #FF6B35;" id="opSign">+</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 13px; color: #FF6B35; font-weight: 600;">Дробь 2</div>
+                        <canvas id="pc2" width="130" height="130"></canvas>
+                    </div>
+                    <div style="font-size: 28px; font-weight: bold; color: #4CAF50;">=</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 13px; color: #4CAF50; font-weight: 600;">Результат</div>
+                        <canvas id="pcr" width="130" height="130"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========== БЛОК EXETER: задачи для самостоятельного решения ========== -->
+    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e0e0e0; padding: 25px; border-radius: 15px; margin: 30px 0; border: 2px solid #e94560;">
+        <h4 style="color: #e94560; margin-top: 0; text-align: center; font-size: 20px;">📝 Задачи для размышления <span style="font-size: 14px; opacity: 0.7;">(в стиле Phillips Exeter)</span></h4>
+        <div style="background: rgba(255,255,255,0.08); padding: 20px; border-radius: 10px;">
+            <ol style="font-size: 16px; line-height: 2.2;">
+                <li>Два друга красили забор. Один покрасил $\frac{2}{5}$ забора, другой — $\frac{1}{3}$. Какую часть забора они покрасили вместе? Остался ли непокрашенный кусок?</li>
+                <li>В бутылке было $\frac{7}{8}$ литра сока. Выпили $\frac{2}{5}$ литра. Сколько осталось?</li>
+                <li>Маша прошла $\frac{1}{6}$ пути, а потом ещё $\frac{3}{8}$ пути. Какую часть пути ей <em>осталось</em> пройти?</li>
+                <li style="color: #FDD835;">⭐ Объясни, почему $\frac{1}{2} + \frac{1}{3} + \frac{1}{6} = 1$. Нарисуй это на пицце.</li>
+            </ol>
+        </div>
+    </div>
+
+
+    <!-- ========== СОВЕТЫ ========== -->
+    <h3 style="color: #FF6B35; margin-top: 40px;">💡 Полезные советы</h3>
+    <ul>
+        <li>Всегда приводите дроби к <strong>наименьшему</strong> общему знаменателю — так проще считать</li>
+        <li>После вычисления проверьте: можно ли <strong>сократить</strong> результат?</li>
+        <li>Числитель больше знаменателя → выдели <strong>целую часть</strong></li>
+        <li>Быстрый способ: $\frac{a}{b} + \frac{c}{d} = \frac{a \cdot d + c \cdot b}{b \cdot d}$ (но не забудь сократить!)</li>
+    </ul>
+
+
+    <!-- ========== ИСТОРИЯ ========== -->
+    <h3 style="color: #1976D2; margin-top: 50px; border-top: 2px solid #E0E0E0; padding-top: 30px;">📜 Немного истории</h3>
+    <div style="background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%); padding: 25px; border-radius: 15px; margin: 25px 0;">
+        <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+            <h4 style="color: #F57C00; margin-top: 0;">🏺 Папирус Ахмеса (≈ 1650 г. до н.э.)</h4>
+            <p style="margin-bottom: 0;">Египетский писец записал 84 математические задачи на папирусе длиной 5 метров. Египтяне складывали только <strong>единичные дроби</strong> (с числителем 1), поэтому даже простые задачи требовали сложных разложений!</p>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+            <h4 style="color: #F57C00; margin-top: 0;">🕌 Аль-Хорезми (IX век)</h4>
+            <p style="margin-bottom: 0;">Персидский учёный описал правила сложения и вычитания дробей с разными знаменателями почти в том виде, в котором мы учим их сегодня. Слово <strong>«алгоритм»</strong> происходит от его имени!</p>
+        </div>
+        <div style="background: #E8F5E9; padding: 20px; border-radius: 10px; margin: 15px 0; border: 2px solid #4CAF50;">
+            <p style="margin: 0; font-style: italic;">💡 <strong>Интересный факт:</strong> В Древнем Риме дроби основывались на делении на 12. Поэтому римляне легко складывали дроби со знаменателями 2, 3, 4, 6 и 12, но путались с $\frac{1}{7}$ или $\frac{1}{11}$.</p>
+        </div>
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+    // ===== Утилиты =====
+    function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t;}return a;}
+    function lcm(a,b){return Math.abs(a*b)/gcd(a,b);}
+
+    // ===== Рисование пиццы =====
+    function drawPizza(id, num, den, color, bg) {
+        var c = document.getElementById(id);
+        if(!c) return;
+        var ctx = c.getContext('2d');
+        var w=c.width, h=c.height, cx=w/2, cy=h/2, r=Math.min(w,h)/2-6;
+        ctx.clearRect(0,0,w,h);
+
+        // тесто
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI);
+        ctx.fillStyle = bg||'#FFECB3'; ctx.fill();
+        ctx.strokeStyle='#D4A017'; ctx.lineWidth=2; ctx.stroke();
+
+        // начинка (закрашенные куски)
+        var sa = -Math.PI/2;
+        var slice = 2*Math.PI/den;
+        for(var i=0;i<num&&i<den;i++){
+            ctx.beginPath(); ctx.moveTo(cx,cy);
+            ctx.arc(cx,cy,r-1, sa+i*slice, sa+(i+1)*slice);
+            ctx.closePath(); ctx.fillStyle=color||'#FF6B35'; ctx.fill();
+        }
+
+        // сырные точки
+        ctx.fillStyle='#FFF9C4';
+        for(var i=0;i<num&&i<den;i++){
+            var ma=sa+(i+0.5)*slice, dr=r*0.5;
+            ctx.beginPath(); ctx.arc(cx+dr*Math.cos(ma), cy+dr*Math.sin(ma), 2.5, 0, 2*Math.PI); ctx.fill();
+        }
+
+        // разрезы
+        ctx.strokeStyle='#8D6E63'; ctx.lineWidth=1.2;
+        for(var i=0;i<den;i++){
+            var a=sa+i*slice;
+            ctx.beginPath(); ctx.moveTo(cx,cy);
+            ctx.lineTo(cx+r*Math.cos(a), cy+r*Math.sin(a)); ctx.stroke();
+        }
+
+        // обводка
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI);
+        ctx.strokeStyle='#8D6E63'; ctx.lineWidth=2.5; ctx.stroke();
+    }
+
+    // ===== Статичные пиццы =====
+    window.addEventListener('load', function(){
+        // Неправильный ответ 2/7
+        drawPizza('pizzaWrong', 2, 7, '#E53935', '#FFECB3');
+        // Правильный ответ 7/12
+        drawPizza('pizzaRight', 7, 12, '#4CAF50', '#FFECB3');
+
+        // Шаг 1: исходные 1/3 и 1/4
+        drawPizza('pizzaStep1a', 1, 3, '#FF6B35', '#FFECB3');
+        drawPizza('pizzaStep1b', 1, 4, '#1976D2', '#FFECB3');
+        // Шаг 2: приведённые 4/12 и 3/12
+        drawPizza('pizzaStep2a', 4, 12, '#FF6B35', '#FFECB3');
+        drawPizza('pizzaStep2b', 3, 12, '#1976D2', '#FFECB3');
+        // Шаг 3: результат 7/12
+        drawPizza('pizzaStep3', 7, 12, '#4CAF50', '#FFECB3');
+
+        // Вычитание
+        drawPizza('pizzaSubA', 9, 12, '#FF6B35', '#FFECB3');
+        drawPizza('pizzaSubB', 4, 12, '#E53935', '#FFECB3');
+        drawPizza('pizzaSubC', 5, 12, '#4CAF50', '#FFECB3');
+    });
+
+    // ===== Интерактивный калькулятор =====
+    function solve(){
+        var n1=parseInt(document.getElementById('f1n').value);
+        var d1=parseInt(document.getElementById('f1d').value);
+        var n2=parseInt(document.getElementById('f2n').value);
+        var d2=parseInt(document.getElementById('f2d').value);
+        var op=document.getElementById('op').value;
+        if(!n1||!d1||!n2||!d2||d1<1||d2<1){alert('Введите корректные числа!');return;}
+
+        var isAdd = (op==='+');
+        var opWord = isAdd?'Складываем':'Вычитаем';
+        var opSym = isAdd?'+':'−';
+        var s='';
+
+        s+='<div style="padding:15px;background:white;border-radius:8px;margin-bottom:15px;">';
+        s+='<div style="font-size:18px;">'+opWord+': <strong style="color:#1976D2;">\\(\\frac{'+n1+'}{'+d1+'}\\)</strong> '+opSym+' <strong style="color:#FF6B35;">\\(\\frac{'+n2+'}{'+d2+'}\\)</strong></div></div>';
+
+        var cd, nn1, nn2, m1, m2;
+        if(d1===d2){
+            cd=d1; nn1=n1; nn2=n2;
+            s+='<div style="padding:12px;background:#E8F5E9;border-radius:8px;margin-bottom:15px;">✅ Знаменатели одинаковые — приведение не нужно!</div>';
+        } else {
+            cd=lcm(d1,d2); m1=cd/d1; m2=cd/d2; nn1=n1*m1; nn2=n2*m2;
+            s+='<div style="padding:15px;background:#FFF3E0;border-radius:8px;margin-bottom:15px;">';
+            s+='<div>⚠️ Знаменатели разные → НОК('+d1+', '+d2+') = <strong>'+cd+'</strong></div></div>';
+            s+='<div style="padding:15px;background:white;border-radius:8px;margin-bottom:15px;">';
+            s+='<div style="margin-bottom:8px;">\\(\\frac{'+n1+'}{'+d1+'} = \\frac{'+n1+'\\times'+m1+'}{'+d1+'\\times'+m1+'} = \\frac{'+nn1+'}{'+cd+'}\\)</div>';
+            s+='<div>\\(\\frac{'+n2+'}{'+d2+'} = \\frac{'+n2+'\\times'+m2+'}{'+d2+'\\times'+m2+'} = \\frac{'+nn2+'}{'+cd+'}\\)</div></div>';
+        }
+
+        var rn = isAdd ? nn1+nn2 : nn1-nn2;
+        s+='<div style="padding:12px;background:#E3F2FD;border-radius:8px;margin-bottom:15px;">'+opWord+' числители: '+nn1+' '+opSym+' '+nn2+' = '+rn+'</div>';
+
+        if(rn<0){
+            s+='<div style="padding:12px;background:#FFCDD2;border-radius:8px;margin-bottom:15px;">⚠️ Результат отрицательный!</div>';
+        }
+
+        var g=gcd(Math.abs(rn),cd), fn=rn/g, fd=cd/g;
+        s+='<div style="padding:20px;background:#C8E6C9;border-radius:8px;border:2px solid #4CAF50;">';
+        s+='<div style="font-size:18px;font-weight:600;color:#4CAF50;margin-bottom:10px;">✅ Результат:</div>';
+        var rs='\\(\\frac{'+rn+'}{'+cd+'}\\)';
+        if(g>1) { rs+=' = \\(\\frac{'+fn+'}{'+fd+'}\\)'; s+='<div style="font-size:14px;color:#666;margin-bottom:8px;">Сокращаем на '+g+'</div>'; }
+        if(Math.abs(fn)>fd && fd>0){
+            var wh=Math.floor(Math.abs(fn)/fd), rm=Math.abs(fn)%fd, sg=fn<0?'−':'';
+            if(rm>0) rs+=' = \\('+sg+wh+'\\frac{'+rm+'}{'+fd+'}\\)'; else rs+=' = '+sg+wh;
+        }
+        s+='<div style="font-size:22px;text-align:center;font-weight:bold;color:#4CAF50;">\\(\\frac{'+n1+'}{'+d1+'}\\) '+opSym+' \\(\\frac{'+n2+'}{'+d2+'}\\) = '+rs+'</div></div>';
+
+        document.getElementById('steps').innerHTML=s;
+        document.getElementById('result').style.display='block';
+        document.getElementById('opSign').textContent=opSym;
+
+        drawPizza('pc1',Math.min(n1,d1),d1,'#1976D2','#FFECB3');
+        drawPizza('pc2',Math.min(n2,d2),d2,'#FF6B35','#FFECB3');
+        var aRn=Math.abs(fn);
+        if(aRn<=fd) drawPizza('pcr',aRn,fd,'#4CAF50','#FFECB3');
+        else drawPizza('pcr',fd,fd,'#4CAF50','#FFECB3');
+
+        if(window.MathJax){MathJax.typesetPromise([document.getElementById('steps')]);}
+    }
+    </script>
+</div>

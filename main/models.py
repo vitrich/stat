@@ -285,6 +285,63 @@ class LessonTask(models.Model):
         
         return tasks
 
+    def generate_addsub_tasks(self):
+        tasks = []
+        denominators = [2, 3, 4, 5, 6, 8, 10, 12]
+
+        # 5 задач на сложение (разные знаменатели)
+        for _ in range(5):
+            d1 = random.choice(denominators)
+            d2 = random.choice([d for d in denominators if d != d1])
+            n1 = random.randint(1, d1 - 1)
+            n2 = random.randint(1, d2 - 1)
+            result = Fraction(n1, d1) + Fraction(n2, d2)
+            tasks.append({
+                'type': 'add_diff_denom',
+                'numerator1': n1, 
+                'denominator1': d1,
+                'numerator2': n2, 
+                'denominator2': d2,
+                'answer': f"{result.numerator}/{result.denominator}"
+            })
+
+        # 4 задачи на вычитание (разные знаменатели)
+        for _ in range(4):
+            d1 = random.choice(denominators)
+            d2 = random.choice([d for d in denominators if d != d1])
+            n1 = random.randint(1, d1 - 1)
+            n2 = random.randint(1, d2 - 1)
+            f1, f2 = Fraction(n1, d1), Fraction(n2, d2)
+            if f1 < f2: 
+                n1, d1, n2, d2 = n2, d2, n1, d1
+                f1, f2 = f2, f1
+            result = f1 - f2
+            tasks.append({
+                'type': 'sub_diff_denom',
+                'numerator1': n1, 
+                'denominator1': d1,
+                'numerator2': n2, 
+                'denominator2': d2,
+                'answer': f"{result.numerator}/{result.denominator}"
+            })
+
+        # 1 задача посложнее
+        pairs = [(6,8),(8,10),(6,10),(4,6),(8,12)]
+        d1, d2 = pairs[random.randint(0, len(pairs)-1)]
+        n1 = random.randint(d1//2+1, d1-1)
+        n2 = random.randint(1, d2//2)
+        result = Fraction(n1,d1) + Fraction(n2,d2)
+        tasks.append({
+            'type': 'add_diff_denom',
+            'numerator1': n1, 
+            'denominator1': d1,
+            'numerator2': n2, 
+            'denominator2': d2,
+            'answer': f"{result.numerator}/{result.denominator}",
+            'difficulty': 'hard'
+        })
+        return tasks
+
     def check_answers(self, submitted_answers):
         """Проверка ответов и выставление оценки"""
         tasks = json.loads(self.tasks_data)
@@ -307,7 +364,13 @@ class LessonTask(models.Model):
                 # Для сравнений нормализуем ответ
                 user_answer_normalized = user_answer.replace(' ', '')
                 correct_answer_normalized = correct_answer.replace(' ', '')
-                is_correct = user_answer_normalized == correct_answer_normalized
+                try:
+                    if '/' in user_answer_normalized:
+                        is_correct = (Fraction(user_answer_normalized) == Fraction(correct_answer_normalized))
+                    else:
+                        is_correct = (user_answer_normalized == correct_answer_normalized)
+                except ValueError:
+                    is_correct = False
             else:
                 # Для дробей проверяем точное совпадение или эквивалентность
                 is_correct = user_answer.lower() == correct_answer.lower()
